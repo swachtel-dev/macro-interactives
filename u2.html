@@ -1,0 +1,1489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Market Lab — ECONM-I Unit 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:        #f4ead2;
+  --paper-light:  #fbf5e3;
+  --paper-deep:   #ead9af;
+  --ink:          #1a120a;
+  --ink-soft:     #463a26;
+  --ink-faint:    #8a7654;
+  --rule:         #c4a373;
+  --rule-soft:    #ddc99c;
+  --demand:       #a83232;
+  --demand-soft:  #ead2cb;
+  --demand-tint:  rgba(168, 50, 50, 0.10);
+  --supply:       #3d5d2e;
+  --supply-soft:  #d8e0c5;
+  --supply-tint:  rgba(61, 93, 46, 0.10);
+  --gold:         #c89933;
+  --gold-soft:    #f0deb1;
+  --ok:           #4d7a3a;
+  --bad:          #b04428;
+
+  --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --body:    "Fraunces", "Iowan Old Style", Georgia, serif;
+  --mono:    "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --gutter:       28px;
+  --radius:       3px;
+  --shadow-soft:  0 1px 0 rgba(26, 18, 10, 0.06);
+  --motion-fast:  180ms;
+  --motion:       320ms;
+  --ease:         cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  background-image:
+    radial-gradient(circle at 25% 15%, rgba(196, 163, 115, 0.10), transparent 55%),
+    radial-gradient(circle at 78% 82%, rgba(168, 50, 50, 0.06), transparent 60%);
+  color: var(--ink);
+  font-family: var(--body);
+  font-feature-settings: "ss01", "kern", "liga";
+  font-variation-settings: "opsz" 14, "SOFT" 30;
+  font-size: 18px;
+  line-height: 1.6;
+  letter-spacing: 0.005em;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.07 0 0 0 0 0.04 0 0 0 0 0.14 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply;
+}
+
+main { position: relative; z-index: 2; }
+
+/* HERO */
+.hero { position: relative; padding: 80px var(--gutter) 60px; border-bottom: 1px solid var(--rule); overflow: hidden; }
+.hero-inner { max-width: 1080px; margin: 0 auto; position: relative; }
+.hero .eyebrow {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-faint); display: flex; align-items: center; gap: 14px; margin: 0 0 22px;
+}
+.hero .eyebrow::before, .hero .eyebrow::after { content: ""; flex: 0 0 32px; height: 1px; background: var(--rule); }
+.hero .eyebrow::after { flex: 1; }
+.hero h1 {
+  font-family: var(--display); font-variation-settings: "opsz" 144, "SOFT" 0;
+  font-weight: 800; font-size: clamp(48px, 8vw, 96px); line-height: 0.95;
+  letter-spacing: -0.025em; margin: 0 0 8px; max-width: 12ch;
+}
+.hero h1 em { font-style: italic; font-variation-settings: "opsz" 144, "SOFT" 100; color: var(--demand); }
+.hero .deck {
+  font-size: 22px; font-style: italic; color: var(--ink-soft);
+  max-width: 34ch; margin: 18px 0 30px; line-height: 1.4;
+  font-variation-settings: "opsz" 36, "SOFT" 80;
+}
+.hero .meta {
+  display: flex; gap: 32px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em;
+  color: var(--ink-faint); text-transform: uppercase; border-top: 1px solid var(--rule-soft);
+  padding-top: 16px; margin-top: 30px; flex-wrap: wrap;
+}
+.hero .meta span strong { color: var(--ink); font-weight: 600; letter-spacing: 0; }
+.toc {
+  position: absolute; right: var(--gutter); top: 80px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
+  color: var(--ink-faint); text-align: right; display: none;
+}
+@media (min-width: 1100px) { .toc { display: block; } }
+.toc ol { list-style: none; padding: 0; margin: 0; }
+.toc li { margin-bottom: 8px; }
+.toc a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color var(--motion-fast) var(--ease); }
+.toc a:hover, .toc a:focus { border-bottom-color: var(--demand); outline: none; }
+.toc .toc-num { display: inline-block; width: 18px; text-align: right; margin-right: 8px; color: var(--ink-faint); }
+
+/* SECTIONS */
+section.beat { padding: 72px var(--gutter) 40px; border-bottom: 1px solid var(--rule-soft); position: relative; }
+section.beat:last-of-type { border-bottom: 0; }
+.beat-inner { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 32px; }
+@media (min-width: 880px) {
+  .beat-inner.cols-2 { grid-template-columns: 280px 1fr; gap: 56px; align-items: start; }
+}
+.beat .num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--demand); margin-bottom: 8px; }
+.beat h2 {
+  font-family: var(--display); font-variation-settings: "opsz" 96, "SOFT" 20;
+  font-weight: 700; font-size: clamp(32px, 4.4vw, 50px); line-height: 1;
+  letter-spacing: -0.018em; margin: 0 0 18px;
+}
+.beat h2 em { font-style: italic; font-variation-settings: "opsz" 96, "SOFT" 100; color: var(--demand); }
+.beat-side .sticky { position: sticky; top: 32px; }
+.beat h3 { font-family: var(--display); font-weight: 600; font-size: 22px; margin: 32px 0 10px; letter-spacing: -0.005em; }
+.beat p { margin: 0 0 16px; }
+.beat p.lede { font-size: 21px; line-height: 1.5; color: var(--ink); margin-bottom: 26px; }
+.beat strong { font-weight: 600; color: var(--ink); }
+.beat em { font-style: italic; }
+
+.beat .tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.10em; text-transform: uppercase;
+  color: var(--ink-faint); border: 1px solid var(--rule-soft); padding: 4px 10px;
+  border-radius: 100px; background: var(--paper-light);
+}
+.beat .tag.demand { color: var(--demand); border-color: var(--demand-soft); background: var(--demand-tint); }
+.beat .tag.supply { color: var(--supply); border-color: var(--supply-soft); background: var(--supply-tint); }
+
+/* CHART CARD */
+.chart-card {
+  background: var(--paper-light); border: 1px solid var(--rule-soft); border-radius: var(--radius);
+  padding: 22px 22px 18px; box-shadow: var(--shadow-soft); position: relative; overflow: visible;
+}
+.chart-card .chart-title {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-faint); margin: 0 0 12px;
+}
+.chart-card .chart-subtitle {
+  font-family: var(--display); font-style: italic; font-size: 14px; color: var(--ink-soft);
+  margin: -6px 0 14px;
+}
+.chart-card svg { display: block; width: 100%; height: auto; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
+.chart-card .chart-card-grid {
+  display: grid; grid-template-columns: 1fr; gap: 18px;
+}
+@media (min-width: 720px) {
+  .chart-card.with-side .chart-card-grid { grid-template-columns: 1fr 220px; }
+}
+.chart-aside {
+  font-family: var(--body); font-size: 14px; line-height: 1.5; color: var(--ink-soft);
+  padding-left: 18px; border-left: 2px solid var(--rule-soft);
+}
+.chart-aside p { margin: 0 0 10px; }
+.chart-aside .label-row { display: flex; gap: 8px; align-items: baseline; margin-bottom: 4px; }
+.chart-aside .label-row .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; align-self: center; }
+.chart-aside .label-row .dot.A { background: var(--demand); }
+.chart-aside .label-row .dot.B { background: var(--ink); }
+.chart-aside .label-row .dot.C { background: var(--supply); }
+.chart-aside strong { color: var(--ink); font-weight: 600; }
+.chart-readout {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px;
+  margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--rule-soft);
+}
+.readout-cell .label { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 2px; }
+.readout-cell .value { font-family: var(--mono); font-size: 19px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.readout-cell .unit { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); font-weight: 400; margin-left: 3px; }
+.readout-cell.demand .value { color: var(--demand); }
+.readout-cell.supply .value { color: var(--supply); }
+.readout-cell.gap .value { color: var(--ink); }
+.readout-cell.gap.surplus .value { color: var(--demand); }
+.readout-cell.gap.shortage .value { color: var(--supply); }
+.chart-help { display: block; margin-top: 10px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: var(--ink-faint); }
+
+/* BUTTONS */
+button.btn {
+  font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase;
+  color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 9px 16px; cursor: pointer;
+  transition: background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease);
+}
+button.btn:hover { background: var(--gold-soft); border-color: var(--gold); }
+button.btn:focus-visible { outline: 2px solid var(--demand); outline-offset: 2px; }
+button.btn:active { transform: translateY(1px); }
+button.btn[aria-pressed="true"] { background: var(--demand); color: var(--paper); border-color: var(--demand); }
+button.btn.primary { background: var(--demand); color: var(--paper); border-color: var(--demand); }
+button.btn.primary:hover { background: #8a2828; border-color: #8a2828; }
+button.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.btn-group { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+
+/* COMPREHENSION Q */
+.cq { margin-top: 28px; background: var(--paper-light); border: 1px solid var(--rule-soft); border-left: 3px solid var(--demand); border-radius: var(--radius); padding: 22px 24px 20px; }
+.cq .cq-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--demand); margin-bottom: 8px; }
+.cq .cq-prompt { font-family: var(--display); font-weight: 600; font-size: 21px; line-height: 1.35; margin: 0 0 16px; }
+.cq .cq-options { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.cq .cq-options li button {
+  width: 100%; text-align: left; font-family: var(--body); font-size: 16px; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--rule-soft); border-radius: var(--radius);
+  padding: 12px 14px; cursor: pointer;
+  transition: border-color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
+}
+.cq .cq-options li button:hover { border-color: var(--gold); }
+.cq .cq-options li button:focus-visible { outline: 2px solid var(--demand); outline-offset: 2px; }
+.cq .cq-options li button.chosen-correct { background: var(--supply-tint); border-color: var(--supply); color: var(--supply); font-weight: 600; }
+.cq .cq-options li button.chosen-wrong { background: var(--demand-tint); border-color: var(--demand); color: var(--demand); }
+.cq .cq-options li button.reveal-correct { border-color: var(--supply); background: var(--paper-light); font-weight: 600; }
+.cq .cq-options li button[disabled] { cursor: default; opacity: 0.92; }
+.cq .cq-explanation { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--rule-soft); font-size: 15px; line-height: 1.5; color: var(--ink-soft); font-style: italic; }
+.cq .cq-explanation:empty { display: none; }
+.cq .cq-source { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--ink-faint); margin-top: 12px; font-style: normal; text-transform: uppercase; }
+
+/* §4 EQ LAB */
+.eqlab .price-line { stroke: var(--ink); stroke-width: 1.4; stroke-dasharray: 4 3; }
+.eqlab .price-grip { fill: var(--paper); stroke: var(--ink); stroke-width: 1.4; cursor: ns-resize; }
+.eqlab .gap-band-surplus { fill: var(--demand); opacity: 0.16; }
+.eqlab .gap-band-shortage { fill: var(--supply); opacity: 0.16; }
+.eqlab svg:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: 2px; }
+.eqlab-tap-help { display: none; font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: var(--ink-faint); margin-top: 8px; }
+@media (hover: none), (pointer: coarse) { .eqlab-tap-help { display: block; } }
+
+/* §5 SIMULATOR */
+.sim-scenarios { display: grid; gap: 8px; margin-bottom: 18px; }
+.sim-scenario {
+  font-family: var(--body); font-size: 16px; color: var(--ink);
+  background: var(--paper-light); border: 1px solid var(--rule-soft); border-radius: var(--radius);
+  padding: 12px 14px; cursor: pointer; text-align: left;
+  display: flex; gap: 12px; align-items: center;
+  transition: border-color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
+}
+.sim-scenario .sim-icon {
+  flex: 0 0 32px; height: 32px; border-radius: 50%; background: var(--paper); border: 1px solid var(--rule);
+  display: grid; place-items: center; font-family: var(--display); font-size: 18px; font-weight: 600; color: var(--ink);
+}
+.sim-scenario .sim-flag {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--gold); margin-left: 6px; padding: 2px 6px; border: 1px solid var(--gold); border-radius: 100px;
+}
+.sim-scenario:hover, .sim-scenario:focus-visible { border-color: var(--gold); outline: none; }
+.sim-scenario[aria-pressed="true"] { border-color: var(--demand); background: var(--demand-tint); }
+.sim-scenario[aria-pressed="true"] .sim-icon { background: var(--demand); color: var(--paper); border-color: var(--demand); }
+
+.reasoning {
+  margin: 18px 0; padding: 18px 20px; background: var(--paper-light); border: 1px solid var(--rule-soft);
+  border-left: 3px solid var(--gold); border-radius: var(--radius);
+}
+.reasoning h4 {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink-faint); margin: 0 0 10px;
+}
+.reasoning ol { padding-left: 18px; margin: 0; }
+.reasoning li { margin: 0 0 10px; font-size: 15.5px; line-height: 1.5; }
+.reasoning li:last-child { margin-bottom: 0; }
+.reasoning li strong { color: var(--demand); font-weight: 600; }
+.reasoning .reveal { color: var(--ink-soft); font-style: italic; display: block; margin-top: 4px; padding-left: 2px; }
+.reasoning .reveal::before { content: "→ "; color: var(--demand); font-style: normal; }
+
+.predict-block { display: grid; gap: 14px; margin: 18px 0; }
+.predict-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.predict-row .predict-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--ink-faint); width: 110px; }
+
+.sim-result {
+  margin-top: 18px; padding: 18px 20px; background: var(--paper-light);
+  border: 1px solid var(--rule-soft); border-radius: var(--radius); display: none;
+}
+.sim-result.shown { display: block; }
+.sim-result h4 { font-family: var(--display); font-weight: 600; font-size: 18px; margin: 0 0 6px; }
+.sim-result.right { border-left: 3px solid var(--ok); }
+.sim-result.wrong { border-left: 3px solid var(--bad); }
+.sim-result .verdict { font-family: var(--mono); font-size: 11px; letter-spacing: 0.10em; text-transform: uppercase; margin-bottom: 8px; }
+.sim-result.right .verdict { color: var(--ok); }
+.sim-result.wrong .verdict { color: var(--bad); }
+.sim-result p { white-space: pre-wrap; }
+
+/* CAPSTONE */
+.capstone { text-align: center; padding: 100px var(--gutter) 100px; background: var(--paper-deep); border-top: 1px solid var(--rule); }
+.capstone-inner { max-width: 720px; margin: 0 auto; }
+.capstone-score {
+  font-family: var(--display); font-weight: 800; font-size: clamp(80px, 14vw, 160px);
+  letter-spacing: -0.04em; line-height: 1; color: var(--demand);
+  font-variation-settings: "opsz" 144, "SOFT" 0; margin: 0;
+}
+.capstone-score .of { font-size: 0.4em; color: var(--ink-soft); font-weight: 500; }
+.capstone-deck { font-family: var(--display); font-style: italic; font-size: 26px; color: var(--ink-soft); margin: 12px 0 30px; }
+.capstone-detail { font-family: var(--mono); font-size: 13px; color: var(--ink-soft); letter-spacing: 0.06em; margin-bottom: 36px; line-height: 1.7; }
+
+/* BREATH */
+.breath { padding: 60px var(--gutter); text-align: center; border-bottom: 1px solid var(--rule-soft); }
+.breath blockquote {
+  font-family: var(--display); font-style: italic; font-weight: 400;
+  font-size: clamp(22px, 3.2vw, 32px); line-height: 1.32; letter-spacing: -0.005em;
+  color: var(--ink-soft); max-width: 24ch; margin: 0 auto;
+  font-variation-settings: "opsz" 72, "SOFT" 100;
+}
+.breath cite {
+  display: block; font-style: normal; font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-top: 16px;
+}
+
+/* FOOTER */
+footer.colophon {
+  padding: 50px var(--gutter) 40px; border-top: 1px solid var(--rule);
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--ink-faint);
+  text-align: center; background: var(--paper);
+}
+footer.colophon p { margin: 0 0 6px; }
+footer.colophon a { color: var(--demand); text-decoration: none; border-bottom: 1px solid var(--demand-soft); }
+footer.colophon a:hover { border-bottom-color: var(--demand); }
+
+/* TWO-EXAMPLE GRID */
+.two-up { display: grid; gap: 22px; margin: 18px 0; }
+@media (min-width: 880px) { .two-up { grid-template-columns: 1fr 1fr; gap: 22px; } }
+.two-up .chart-card { padding: 18px 18px 16px; }
+.two-up .chart-card .chart-title { margin-bottom: 6px; }
+
+/* page-load reveal */
+.hero h1, .hero .deck, .hero .meta, .hero .eyebrow {
+  opacity: 0; transform: translateY(8px); animation: rise 700ms var(--ease) forwards;
+}
+.hero .eyebrow { animation-delay: 0ms; }
+.hero h1 { animation-delay: 120ms; }
+.hero .deck { animation-delay: 260ms; }
+.hero .meta { animation-delay: 400ms; }
+@keyframes rise { to { opacity: 1; transform: translateY(0); } }
+
+/* PDF / print fallback: bypass the fade-in so the hero is fully opaque
+   when Chrome headless prints (otherwise the rendered PDF captures the
+   pre-animation state and the hero looks like a watermark). Also covers
+   users with prefers-reduced-motion. */
+@media print {
+  .hero h1, .hero .deck, .hero .meta, .hero .eyebrow {
+    opacity: 1 !important; transform: none !important; animation: none !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero h1, .hero .deck, .hero .meta, .hero .eyebrow {
+    opacity: 1; transform: none; animation: none;
+  }
+}
+:focus-visible { outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">ECONM-I · Unit 02 · Interactive lab</p>
+    <h1>The <em>Market</em> Lab.</h1>
+    <p class="deck">A short, hands-on companion to <em>Markets and Coordination</em>. Read two charts. Find an equilibrium. Then reason your way through four real-world events.</p>
+    <div class="meta">
+      <span><strong>~12 minutes</strong> · at a brisk pace</span>
+      <span><strong>4 interactives</strong> · drag, predict, reason</span>
+      <span><strong>self-scored</strong> · no signup, no tracking</span>
+    </div>
+  </div>
+  <nav class="toc" aria-label="Sections">
+    <ol>
+      <li><a href="#read-d"><span class="toc-num">01</span>Read demand</a></li>
+      <li><a href="#read-s"><span class="toc-num">02</span>Read supply</a></li>
+      <li><a href="#eq-ex"><span class="toc-num">03</span>Equilibrium</a></li>
+      <li><a href="#eq-lab"><span class="toc-num">04</span>Lab</a></li>
+      <li><a href="#sim"><span class="toc-num">05</span>Simulator</a></li>
+      <li><a href="#score"><span class="toc-num">06</span>Score</a></li>
+    </ol>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ────────────── §1 Read demand: DOUGHNUTS ────────────── -->
+  <section class="beat" id="read-d">
+    <div class="beat-inner cols-2">
+      <aside class="beat-side"><div class="sticky">
+        <p class="num">01 · the buyer's side</p>
+        <h2>The doughnut <em>demand</em> curve.</h2>
+        <span class="tag demand">demand</span>
+      </div></aside>
+      <div class="beat-body">
+        <p class="lede">Picture the doughnut shop in your neighborhood. The owner can charge whatever she wants. How many doughnuts she sells each week depends on the price.</p>
+        <p>Two observations from her last two months of pricing experiments:</p>
+        <ul>
+          <li>When she charged <strong>$4 per doughnut</strong>, she sold about <strong>30 doughnuts a week</strong>.</li>
+          <li>When she cut the price to <strong>$2 per doughnut</strong>, she sold about <strong>70 doughnuts a week</strong>.</li>
+        </ul>
+        <p>Connect those two observations with a line and you have her market's <strong>demand curve</strong>. Each point on it answers one question: <em>at this price, how many doughnuts get bought?</em></p>
+
+        <div class="chart-card with-side">
+          <p class="chart-title">demand for doughnuts in your neighborhood</p>
+          <div class="chart-card-grid">
+            <div id="chart-demand"></div>
+            <div class="chart-aside">
+              <div class="label-row"><span class="dot A"></span><strong>Point A</strong></div>
+              <p style="margin-top: 0;">At <strong>$4</strong>, the shop sells <strong>30 doughnuts</strong> a week.</p>
+              <div class="label-row"><span class="dot B"></span><strong>Point B</strong></div>
+              <p style="margin-top: 0;">At <strong>$2</strong>, it sells <strong>70 doughnuts</strong>.</p>
+            </div>
+          </div>
+          <p class="chart-help">Hover (or tap) anywhere on the line to read the curve at any other price.</p>
+        </div>
+
+        <div class="cq" data-cq="q1">
+          <p class="cq-eyebrow">Comprehension · 01 of 03</p>
+          <p class="cq-prompt">Suppose the doughnut shop cuts the price further, from $2 to $1. What does the demand curve predict will happen to the number of doughnuts sold per week?</p>
+          <ul class="cq-options">
+            <li><button data-correct="true" data-explain="Right. Cheaper means more. The curve says somewhere around 90 doughnuts a week at $1. You're sliding further down the same curve.">It rises further, to around 90 doughnuts a week.</button></li>
+            <li><button data-correct="false" data-explain="No. Lower prices bring out more buying, not less. By the law of demand, the curve slopes down: when price falls, quantity demanded rises.">It falls. Customers think it's a discount and lose interest.</button></li>
+            <li><button data-correct="false" data-explain="No. The curve is a relationship between price and quantity. Move the price, and the quantity changes with it.">It stays at 70. The shop already maxed out.</button></li>
+          </ul>
+          <p class="cq-explanation"></p>
+          <span class="cq-source">Defined on: the demand curve just above.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── §2 Read supply: UBER ────────────── -->
+  <section class="beat" id="read-s">
+    <div class="beat-inner cols-2">
+      <aside class="beat-side"><div class="sticky">
+        <p class="num">02 · the seller's side</p>
+        <h2>The Uber <em>supply</em> curve.</h2>
+        <span class="tag supply">supply</span>
+      </div></aside>
+      <div class="beat-body">
+        <p class="lede">Same logic on the other side. Picture an Uber driver in your city, deciding whether to log on tonight.</p>
+        <p>The going rate for a ride affects whether she bothers. Across the city, multiply that decision by every driver. Two snapshots from a typical week:</p>
+        <ul>
+          <li>At <strong>$10 per ride</strong>, about <strong>20 drivers per hour</strong> are logged on and willing to drive.</li>
+          <li>When surge pricing pushed the rate to <strong>$30 per ride</strong>, about <strong>100 drivers per hour</strong> were on.</li>
+        </ul>
+        <p>That is the city's <strong>supply curve</strong>. It slopes upward because, when the going rate rises, more drivers find the work worth their time.</p>
+
+        <div class="chart-card with-side">
+          <p class="chart-title">supply of Uber rides per hour in your city</p>
+          <div class="chart-card-grid">
+            <div id="chart-supply"></div>
+            <div class="chart-aside">
+              <div class="label-row"><span class="dot C" style="background: var(--supply);"></span><strong>Point A</strong></div>
+              <p style="margin-top: 0;">At <strong>$10/ride</strong>, about <strong>20 drivers</strong> are on.</p>
+              <div class="label-row"><span class="dot B"></span><strong>Point B</strong></div>
+              <p style="margin-top: 0;">At <strong>$30/ride</strong>, about <strong>100 drivers</strong> are on.</p>
+            </div>
+          </div>
+          <p class="chart-help">Hover (or tap) anywhere on the line to read the curve at any other rate.</p>
+        </div>
+
+        <div class="cq" data-cq="q2">
+          <p class="cq-eyebrow">Comprehension · 02 of 03</p>
+          <p class="cq-prompt">A heavy storm pushes the going Uber rate from $20 to $25. What does the supply curve predict happens to the number of drivers logged on per hour?</p>
+          <ul class="cq-options">
+            <li><button data-correct="true" data-explain="Right. Higher rates bring out more drivers. From the curve, $20 sits at about 60 drivers; at $25, around 80. The number of drivers rises.">It rises. More drivers find $25 worth their time than $20.</button></li>
+            <li><button data-correct="false" data-explain="No. The law of supply says higher prices bring out more, not less. Drivers who would not log on at $20 will log on at $25.">It falls. The storm scares drivers off the road.</button></li>
+            <li><button data-correct="false" data-explain="No. The whole point of the curve is that the rate matters. Drivers respond to the going rate by deciding whether to log on.">It stays the same. The same drivers are working either way.</button></li>
+          </ul>
+          <p class="cq-explanation"></p>
+          <span class="cq-source">Defined on: the supply curve just above.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── BREATH ────────────── -->
+  <section class="breath">
+    <blockquote>Equilibrium is not the right price or the fair price. It is the price at which the market clears.</blockquote>
+    <cite>— from <em>Markets and Coordination</em></cite>
+  </section>
+
+  <!-- ────────────── §3 Equilibrium examples ────────────── -->
+  <section class="beat" id="eq-ex">
+    <div class="beat-inner cols-2">
+      <aside class="beat-side"><div class="sticky">
+        <p class="num">03 · where they meet</p>
+        <h2>Two <em>equilibria</em>, side by side.</h2>
+        <p style="font-size: 15px; line-height: 1.5; color: var(--ink-soft); margin-top: 12px;">Put a demand curve and a supply curve on the same chart. They cross at one point. That is the <strong>equilibrium price</strong> and the <strong>equilibrium quantity</strong>. The market clears: every buyer who wants in at that price finds a seller, and every seller finds a buyer.</p>
+      </div></aside>
+      <div class="beat-body">
+        <p class="lede">Two worked examples before you touch the controls. Same shape, different markets.</p>
+        <div class="two-up">
+          <div class="chart-card">
+            <p class="chart-title">doughnut market</p>
+            <p class="chart-subtitle">Equilibrium: $3 per doughnut, 50 doughnuts per week.</p>
+            <div id="chart-eq-doughnut-ex"></div>
+          </div>
+          <div class="chart-card">
+            <p class="chart-title">uber rides market</p>
+            <p class="chart-subtitle">Equilibrium: $20 per ride, 60 rides per hour.</p>
+            <div id="chart-eq-uber-ex"></div>
+          </div>
+        </div>
+        <p style="margin-top: 22px;">Notice both charts use the same shape: demand sloping down, supply sloping up, the curves meeting at a single point. The units differ (doughnuts and dollars per doughnut on one; ride-hours and dollars per ride on the other), but the geometry is the same.</p>
+        <p>Below, the same picture becomes interactive. You can pick a price other than the equilibrium and watch what goes wrong.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── §4 Equilibrium lab ────────────── -->
+  <section class="beat eqlab" id="eq-lab">
+    <div class="beat-inner cols-2">
+      <aside class="beat-side"><div class="sticky">
+        <p class="num">04 · the lab</p>
+        <h2>Now <em>play</em>.</h2>
+        <p style="font-size: 15px; line-height: 1.5; color: var(--ink-soft); margin-top: 12px;">The doughnut market again. Drag the dashed price line up or down. When you set a price above $3, sellers can produce more than buyers want (a <strong>surplus</strong> of unsold doughnuts). Below $3, buyers want more than the shop can make (a <strong>shortage</strong>; doughnuts disappear by 8 a.m.).</p>
+      </div></aside>
+      <div class="beat-body">
+        <p class="lede">Drag the dashed line. The colored band shows the gap between what sellers want to sell and what buyers want to buy.</p>
+        <div class="chart-card">
+          <p class="chart-title">doughnut market · interactive</p>
+          <div id="chart-eq"></div>
+          <div class="chart-readout">
+            <div class="readout-cell"><span class="label">Price</span><span class="value" id="eq-p">—</span></div>
+            <div class="readout-cell demand"><span class="label">Buyers want</span><span class="value" id="eq-qd">—</span><span class="unit">doughnuts</span></div>
+            <div class="readout-cell supply"><span class="label">Sellers offer</span><span class="value" id="eq-qs">—</span><span class="unit">doughnuts</span></div>
+            <div class="readout-cell gap" id="eq-gap-cell"><span class="label" id="eq-gap-label">Status</span><span class="value" id="eq-gap">—</span></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn primary" id="eq-snap">snap to equilibrium</button>
+            <button class="btn" id="eq-high">try $5</button>
+            <button class="btn" id="eq-low">try $1.50</button>
+          </div>
+          <p class="eqlab-tap-help">On touch, tap the chart anywhere to set the price at that height. Arrow keys also work when the chart is focused.</p>
+        </div>
+        <div class="cq" data-cq="q3">
+          <p class="cq-eyebrow">Comprehension · 03 of 03</p>
+          <p class="cq-prompt">The doughnut market lab opens with the price line above the equilibrium at $4.50. The readout shows buyers want 20 doughnuts, sellers offer 80, and a surplus of 60 doughnuts. What does that 60-doughnut gap represent?</p>
+          <ul class="cq-options">
+            <li><button data-correct="true" data-explain="Right. At $4.50, above the market-clearing price, the shop wants to produce far more doughnuts than anyone is willing to buy. The 60 leftover doughnuts are a surplus. The shop's natural next move is to cut the price toward equilibrium.">A surplus. The shop offers 60 more doughnuts than people will buy at $4.50.</button></li>
+            <li><button data-correct="false" data-explain="No. A shortage happens below the equilibrium price, where buyers want more than the shop offers. Drag the price below the equilibrium and the colored band switches sides.">A shortage. People can't get the doughnuts they want.</button></li>
+            <li><button data-correct="false" data-explain="No. Equilibrium is the one price where buyers and sellers want the same quantity. At $4.50 buyers want 20 and the shop offers 80, so the market is not in balance.">Equilibrium. The market is balanced.</button></li>
+          </ul>
+          <p class="cq-explanation"></p>
+          <span class="cq-source">Visible directly in the lab readouts above.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── BREATH ────────────── -->
+  <section class="breath">
+    <blockquote>When something changes in a market, ask: what changed, who's affected, in which direction, and what happens to the equilibrium.</blockquote>
+    <cite>— the four-step move the simulator drills</cite>
+  </section>
+
+  <!-- ────────────── §5 Simulator ────────────── -->
+  <section class="beat" id="sim">
+    <div class="beat-inner cols-2">
+      <aside class="beat-side"><div class="sticky">
+        <p class="num">05 · the simulator</p>
+        <h2>Reason it <em>through</em>.</h2>
+        <p style="font-size: 15px; line-height: 1.5; color: var(--ink-soft); margin-top: 12px;">Four real-world events. For each one, work the four-step move: <strong>what changed</strong>, <strong>who's affected</strong>, <strong>in which direction</strong>, and <strong>what happens to the equilibrium</strong>. The first scenario is a worked example. The other three are yours.</p>
+      </div></aside>
+      <div class="beat-body">
+        <p class="lede">Pick a scenario to start.</p>
+
+        <div class="sim-scenarios" id="sim-scenarios" role="radiogroup" aria-label="Pick a scenario"></div>
+
+        <div class="chart-card">
+          <p class="chart-title">the market, before and after</p>
+          <div id="chart-sim"></div>
+        </div>
+
+        <div id="sim-reasoning"></div>
+
+        <div class="predict-block" id="sim-predict" style="display: none;">
+          <div class="predict-row">
+            <span class="predict-label">Curve that moves</span>
+            <div class="btn-group" role="radiogroup" aria-label="Which curve moves" id="predict-which">
+              <button class="btn" data-predict-curve="demand">demand (buyers)</button>
+              <button class="btn" data-predict-curve="supply">supply (sellers)</button>
+            </div>
+          </div>
+          <div class="predict-row">
+            <span class="predict-label">Direction</span>
+            <div class="btn-group" role="radiogroup" aria-label="Which direction" id="predict-dir">
+              <button class="btn" data-predict-dir="right">right (more at every price)</button>
+              <button class="btn" data-predict-dir="left">left (less at every price)</button>
+            </div>
+          </div>
+          <div>
+            <button class="btn primary" id="sim-play" disabled>play scenario</button>
+            <button class="btn" id="sim-reset">reset</button>
+          </div>
+        </div>
+
+        <div class="sim-result" id="sim-result" aria-live="polite">
+          <p class="verdict" id="sim-verdict"></p>
+          <h4 id="sim-headline"></h4>
+          <p id="sim-explain"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────── §6 Capstone ────────────── -->
+  <section class="capstone" id="score">
+    <div class="capstone-inner">
+      <p class="num" style="color: var(--demand); font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 10px;">06 · your run</p>
+      <p class="capstone-score"><span id="score-num">0</span><span class="of"> / <span id="score-total">7</span></span></p>
+      <p class="capstone-deck" id="score-deck">work through the sections above to score</p>
+      <p class="capstone-detail" id="score-detail">Three comprehension questions and the four scenarios in the simulator each count for one point.</p>
+      <div class="btn-row" style="justify-content: center;">
+        <button class="btn" id="score-reset">reset progress</button>
+        <a href="#read-d" class="btn">back to the top</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="colophon">
+  <p>ECONM-I · Principles of Macroeconomics · Unit 2 Interactive Lab · V2 draft 2026-05-19</p>
+  <p>Companion to the static pages on the course site. <a href="https://swachtel-dev.github.io/macro-batting-cage/">Drill more at the batting cage.</a></p>
+</footer>
+
+<script>
+/* ─────────────────────────────────────────────────────────────────────
+   SVG helpers
+   ──────────────────────────────────────────────────────────────────── */
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs = {}, parent = null) => {
+  const node = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null) continue;
+    node.setAttribute(k, String(v));
+  }
+  if (parent) parent.appendChild(node);
+  return node;
+};
+const COLORS = {
+  ink: "#1a120a", inkSoft: "#463a26", inkFaint: "#8a7654",
+  rule: "#c4a373", ruleSoft: "#ddc99c",
+  demand: "#a83232",
+  supply: "#3d5d2e",
+  gold: "#c89933", paper: "#fbf5e3",
+};
+
+/* Chart geometry constants. viewBox is 600 x 380 with the plot region
+   pulled in from the edges so axis labels, tick labels, and curve labels
+   sit OUTSIDE the plotting area. */
+const VB_W = 600, VB_H = 380;
+const PX = 64, PY = 36;          // plot top-left
+const PW = 480, PH = 280;        // plot width, height
+function makeSvg(host, opts = {}) {
+  const svg = el("svg", {
+    xmlns: NS, viewBox: `0 0 ${VB_W} ${VB_H}`,
+    role: "img", "aria-label": opts.label || "chart",
+  });
+  svg.style.maxWidth = "100%"; svg.style.height = "auto";
+  host.appendChild(svg);
+  return svg;
+}
+
+/* A market config: { pMax, qMax, pUnit, qUnit, pTicks, qTicks } */
+function makeAxes(svg, cfg) {
+  const x_of = q => PX + (q / cfg.qMax) * PW;
+  const y_of = p => PY + PH - (p / cfg.pMax) * PH;
+  // axes
+  el("line", { x1: PX, y1: PY - 6, x2: PX, y2: PY + PH + 2, stroke: COLORS.ink, "stroke-width": 1.4 }, svg);
+  el("line", { x1: PX - 2, y1: PY + PH, x2: PX + PW + 8, y2: PY + PH, stroke: COLORS.ink, "stroke-width": 1.4 }, svg);
+  el("polygon", { points: `${PX},${PY - 12} ${PX - 4},${PY - 2} ${PX + 4},${PY - 2}`, fill: COLORS.ink }, svg);
+  el("polygon", { points: `${PX + PW + 14},${PY + PH} ${PX + PW + 4},${PY + PH - 4} ${PX + PW + 4},${PY + PH + 4}`, fill: COLORS.ink }, svg);
+
+  // axis titles (outside plot)
+  const pTitle = el("text", { x: PX - 50, y: PY + PH / 2, "text-anchor": "middle",
+    "font-family": "IBM Plex Mono", "font-size": 10, "letter-spacing": "0.14em",
+    fill: COLORS.inkFaint, transform: `rotate(-90 ${PX - 50} ${PY + PH / 2})`,
+  }, svg);
+  pTitle.textContent = cfg.pUnit.toUpperCase();
+  const qTitle = el("text", { x: PX + PW / 2, y: PY + PH + 50, "text-anchor": "middle",
+    "font-family": "IBM Plex Mono", "font-size": 10, "letter-spacing": "0.14em",
+    fill: COLORS.inkFaint,
+  }, svg);
+  qTitle.textContent = cfg.qUnit.toUpperCase();
+
+  // tick marks + values
+  for (const tick of cfg.pTicks || []) {
+    const y = y_of(tick);
+    el("line", { x1: PX - 4, y1: y, x2: PX, y2: y, stroke: COLORS.ink, "stroke-width": 1 }, svg);
+    const t = el("text", { x: PX - 8, y: y + 4, "text-anchor": "end",
+      "font-family": "IBM Plex Mono", "font-size": 11, fill: COLORS.inkFaint,
+    }, svg);
+    t.textContent = cfg.pFormat ? cfg.pFormat(tick) : "$" + tick;
+  }
+  for (const tick of cfg.qTicks || []) {
+    const x = x_of(tick);
+    el("line", { x1: x, y1: PY + PH, x2: x, y2: PY + PH + 4, stroke: COLORS.ink, "stroke-width": 1 }, svg);
+    const t = el("text", { x, y: PY + PH + 18, "text-anchor": "middle",
+      "font-family": "IBM Plex Mono", "font-size": 11, fill: COLORS.inkFaint,
+    }, svg);
+    t.textContent = String(tick);
+  }
+  // origin "0"
+  el("text", { x: PX - 8, y: PY + PH + 18, "text-anchor": "end",
+    "font-family": "IBM Plex Mono", "font-size": 11, fill: COLORS.inkFaint,
+  }, svg).textContent = "0";
+
+  return { x_of, y_of };
+}
+
+function drawCurveDemand(svg, cfg, ax, opts = {}) {
+  // demand: Q = a - b*P, given two points or function
+  const fn = opts.demandQ; // q(p)
+  // draw from p=pMax down to p where q crosses qMax+
+  const ptop = Math.max(0, ...[opts.pTop || cfg.pMax]);
+  const xLeft = ax.x_of(fn(ptop));
+  const yLeft = ax.y_of(ptop);
+  // bottom-right: where p=0
+  const xRight = ax.x_of(fn(0));
+  const yRight = ax.y_of(0);
+  const line = el("line", {
+    x1: xLeft, y1: yLeft, x2: xRight, y2: yRight,
+    stroke: COLORS.demand, "stroke-width": opts.thickness || 2.6,
+    "stroke-opacity": opts.opacity ?? 1, "stroke-linecap": "round",
+  }, svg);
+  if (opts.label !== false) {
+    // Label at the TOP of the curve, just to the right of intercept
+    const t = el("text", { x: xLeft + 8, y: yLeft + 4,
+      fill: COLORS.demand, "fill-opacity": opts.opacity ?? 1,
+      "font-family": "Fraunces", "font-weight": 700, "font-size": 17,
+    }, svg);
+    t.textContent = opts.label || "D";
+  }
+  return line;
+}
+
+function drawCurveSupply(svg, cfg, ax, opts = {}) {
+  const fn = opts.supplyQ; // q(p)
+  // supply usually starts at some pMin where q=0
+  const pBottom = opts.pBottom || 0;
+  const pTop = opts.pTop || cfg.pMax;
+  const xLeft = ax.x_of(fn(pBottom));
+  const yLeft = ax.y_of(pBottom);
+  const xRight = ax.x_of(fn(pTop));
+  const yRight = ax.y_of(pTop);
+  const line = el("line", {
+    x1: xLeft, y1: yLeft, x2: xRight, y2: yRight,
+    stroke: COLORS.supply, "stroke-width": opts.thickness || 2.6,
+    "stroke-opacity": opts.opacity ?? 1, "stroke-linecap": "round",
+  }, svg);
+  if (opts.label !== false) {
+    const t = el("text", { x: xRight + 8, y: yRight + 4,
+      fill: COLORS.supply, "fill-opacity": opts.opacity ?? 1,
+      "font-family": "Fraunces", "font-weight": 700, "font-size": 17,
+    }, svg);
+    t.textContent = opts.label || "S";
+  }
+  return line;
+}
+
+function drawLabeledPoint(svg, ax, p, q, opts) {
+  const x = ax.x_of(q), y = ax.y_of(p);
+  // dashed projections to axes
+  if (opts.projections !== false) {
+    el("line", { x1: x, y1: y, x2: x, y2: ax.y_of(0), stroke: opts.color || COLORS.ink,
+      "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0.6 }, svg);
+    el("line", { x1: x, y1: y, x2: ax.x_of(0), y2: y, stroke: opts.color || COLORS.ink,
+      "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0.6 }, svg);
+  }
+  el("circle", { cx: x, cy: y, r: opts.radius || 5,
+    fill: opts.color || COLORS.ink, stroke: COLORS.paper, "stroke-width": 2 }, svg);
+  if (opts.label) {
+    // Position label offset; use opts.labelDX and labelDY for control
+    const ldx = opts.labelDX ?? 10, ldy = opts.labelDY ?? -10;
+    const labelEl = el("text", {
+      x: x + ldx, y: y + ldy, fill: opts.color || COLORS.ink,
+      "font-family": "Fraunces", "font-weight": 700, "font-size": 16,
+    }, svg);
+    labelEl.textContent = opts.label;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   MARKETS
+   ──────────────────────────────────────────────────────────────────── */
+// Doughnut market: Q = 110 - 20P (demand), Q = 20P - 10 (supply)
+// Equilibrium at P = $3, Q = 50.
+const DOUGHNUT = {
+  pMax: 6, qMax: 110,
+  pUnit: "$ per doughnut", qUnit: "doughnuts per week",
+  pTicks: [1, 2, 3, 4, 5, 6],
+  qTicks: [25, 50, 75, 100],
+  pFormat: t => "$" + t,
+  demandQ: p => Math.max(0, 110 - 20 * p),   // q at price p
+  demandP: q => Math.max(0, (110 - q) / 20), // p that yields quantity q
+  supplyQ: p => Math.max(0, 20 * p - 10),
+  supplyP: q => (q + 10) / 20,
+  eqP: 3, eqQ: 50,
+};
+// Uber market: Q = 140 - 4P (demand), Q = 4P - 20 (supply)
+// Equilibrium at P = $20, Q = 60 rides/hour.
+const UBER = {
+  pMax: 35, qMax: 150,
+  pUnit: "$ per ride", qUnit: "rides per hour",
+  pTicks: [5, 10, 15, 20, 25, 30, 35],
+  qTicks: [25, 50, 75, 100, 125, 150],
+  pFormat: t => "$" + t,
+  demandQ: p => Math.max(0, 140 - 4 * p),
+  demandP: q => (140 - q) / 4,
+  supplyQ: p => Math.max(0, 4 * p - 20),
+  supplyP: q => (q + 20) / 4,
+  eqP: 20, eqQ: 60,
+};
+// Uber-only chart for §2 supply (no demand shown; supply only)
+const UBER_SUPPLY_ONLY = { ...UBER, pTicks: [5, 10, 15, 20, 25, 30, 35] };
+// Doughnut-only for §1 demand
+const DOUGHNUT_DEMAND_ONLY = { ...DOUGHNUT };
+
+/* ─────────────────────────────────────────────────────────────────────
+   §1 chart: doughnut demand with labeled points + hover
+   ──────────────────────────────────────────────────────────────────── */
+(function buildDemand() {
+  const cfg = DOUGHNUT_DEMAND_ONLY;
+  const svg = makeSvg(document.getElementById("chart-demand"), {
+    label: "Doughnut demand curve. The price is on the vertical axis in dollars; quantity is on the horizontal axis in doughnuts per week. Point A: at $4 per doughnut, 30 doughnuts a week. Point B: at $2 per doughnut, 70 doughnuts a week. The curve through these two points slopes down.",
+  });
+  const ax = makeAxes(svg, cfg);
+  drawCurveDemand(svg, cfg, ax, { demandQ: cfg.demandQ, label: "D" });
+
+  // Point A at $4, Q=30
+  drawLabeledPoint(svg, ax, 4, 30, { label: "A", color: COLORS.demand, labelDX: 12, labelDY: -8 });
+  // Point B at $2, Q=70
+  drawLabeledPoint(svg, ax, 2, 70, { label: "B", color: COLORS.demand, labelDX: 12, labelDY: -8 });
+
+  // Hover tooltip
+  const tip = el("g", { opacity: 0 }, svg);
+  const tipDot = el("circle", { r: 4.5, fill: COLORS.ink, stroke: COLORS.paper, "stroke-width": 2 }, tip);
+  const tipBg = el("rect", { rx: 3, ry: 3, fill: COLORS.paper, stroke: COLORS.rule, "stroke-width": 1 }, tip);
+  const tipText = el("text", { "font-family": "IBM Plex Mono", "font-size": 12, "font-weight": 500, fill: COLORS.ink }, tip);
+  function showTip(svgPt) {
+    const q = Math.max(0, Math.min(cfg.qMax, (svgPt.x - PX) / PW * cfg.qMax));
+    const p = cfg.demandP(q);
+    if (p > cfg.pMax || p < 0) { tip.setAttribute("opacity", 0); return; }
+    const xx = ax.x_of(q), yy = ax.y_of(p);
+    tipDot.setAttribute("cx", xx); tipDot.setAttribute("cy", yy);
+    const text = `$${p.toFixed(2).replace(/\.00$/, "")}  ·  ${q.toFixed(0)} doughnuts`;
+    tipText.textContent = text;
+    const w = text.length * 7 + 16;
+    const tx = Math.min(xx + 14, VB_W - w - 4);
+    const ty = Math.max(yy - 26, PY + 4);
+    tipBg.setAttribute("x", tx); tipBg.setAttribute("y", ty);
+    tipBg.setAttribute("width", w); tipBg.setAttribute("height", 22);
+    tipText.setAttribute("x", tx + 8); tipText.setAttribute("y", ty + 15);
+    tip.setAttribute("opacity", 1);
+  }
+  const ptr = e => {
+    const r = svg.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * VB_W / r.width, y: (e.clientY - r.top) * VB_H / r.height };
+  };
+  svg.addEventListener("pointermove", e => showTip(ptr(e)));
+  svg.addEventListener("pointerleave", () => tip.setAttribute("opacity", 0));
+  svg.addEventListener("touchend", () => tip.setAttribute("opacity", 0));
+})();
+
+/* ─────────────────────────────────────────────────────────────────────
+   §2 chart: uber supply with labeled points + hover
+   ──────────────────────────────────────────────────────────────────── */
+(function buildSupply() {
+  const cfg = UBER_SUPPLY_ONLY;
+  const svg = makeSvg(document.getElementById("chart-supply"), {
+    label: "Uber supply curve. Price per ride on the vertical axis; number of drivers logged on per hour on the horizontal axis. Point A: at $10 per ride, 20 drivers per hour. Point B: at $30 per ride, 100 drivers per hour. The curve slopes up.",
+  });
+  const ax = makeAxes(svg, cfg);
+  drawCurveSupply(svg, cfg, ax, { supplyQ: cfg.supplyQ, label: "S" });
+
+  drawLabeledPoint(svg, ax, 10, 20, { label: "A", color: COLORS.supply, labelDX: -18, labelDY: -8 });
+  drawLabeledPoint(svg, ax, 30, 100, { label: "B", color: COLORS.supply, labelDX: -18, labelDY: -8 });
+
+  const tip = el("g", { opacity: 0 }, svg);
+  const tipDot = el("circle", { r: 4.5, fill: COLORS.ink, stroke: COLORS.paper, "stroke-width": 2 }, tip);
+  const tipBg = el("rect", { rx: 3, ry: 3, fill: COLORS.paper, stroke: COLORS.rule, "stroke-width": 1 }, tip);
+  const tipText = el("text", { "font-family": "IBM Plex Mono", "font-size": 12, "font-weight": 500, fill: COLORS.ink }, tip);
+  function showTip(svgPt) {
+    const q = Math.max(0, Math.min(cfg.qMax, (svgPt.x - PX) / PW * cfg.qMax));
+    const p = cfg.supplyP(q);
+    if (p > cfg.pMax || p < 0) { tip.setAttribute("opacity", 0); return; }
+    const xx = ax.x_of(q), yy = ax.y_of(p);
+    tipDot.setAttribute("cx", xx); tipDot.setAttribute("cy", yy);
+    const text = `$${p.toFixed(0)}/ride  ·  ${q.toFixed(0)} drivers`;
+    tipText.textContent = text;
+    const w = text.length * 7 + 16;
+    const tx = Math.min(xx + 14, VB_W - w - 4);
+    const ty = Math.max(yy - 26, PY + 4);
+    tipBg.setAttribute("x", tx); tipBg.setAttribute("y", ty);
+    tipBg.setAttribute("width", w); tipBg.setAttribute("height", 22);
+    tipText.setAttribute("x", tx + 8); tipText.setAttribute("y", ty + 15);
+    tip.setAttribute("opacity", 1);
+  }
+  const ptr = e => {
+    const r = svg.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * VB_W / r.width, y: (e.clientY - r.top) * VB_H / r.height };
+  };
+  svg.addEventListener("pointermove", e => showTip(ptr(e)));
+  svg.addEventListener("pointerleave", () => tip.setAttribute("opacity", 0));
+  svg.addEventListener("touchend", () => tip.setAttribute("opacity", 0));
+})();
+
+/* ─────────────────────────────────────────────────────────────────────
+   §3 charts: TWO STATIC EQUILIBRIUM EXAMPLES
+   ──────────────────────────────────────────────────────────────────── */
+function drawStaticEquilibrium(host, cfg, label) {
+  const svg = makeSvg(host, { label });
+  const ax = makeAxes(svg, cfg);
+  drawCurveDemand(svg, cfg, ax, { demandQ: cfg.demandQ, label: "D" });
+  drawCurveSupply(svg, cfg, ax, { supplyQ: cfg.supplyQ, label: "S" });
+  // Equilibrium point + projections + label
+  drawLabeledPoint(svg, ax, cfg.eqP, cfg.eqQ, {
+    color: COLORS.ink, radius: 6, projections: true,
+  });
+  // Add explicit price/quantity callout near the dot
+  const xE = ax.x_of(cfg.eqQ), yE = ax.y_of(cfg.eqP);
+  // Background for callout (paper-colored)
+  const callout = el("g", {}, svg);
+  const calloutText = `$${cfg.eqP} · ${cfg.eqQ} ${cfg.eqQ === 1 ? cfg.qUnit.slice(0,-1) : cfg.qUnit.split(' ')[0]}`;
+  const ctBg = el("rect", {
+    x: xE + 10, y: yE - 28,
+    width: calloutText.length * 6.5 + 14, height: 22,
+    rx: 3, ry: 3, fill: COLORS.paper, stroke: COLORS.ink, "stroke-width": 1,
+  }, callout);
+  const ctText = el("text", {
+    x: xE + 17, y: yE - 13,
+    "font-family": "IBM Plex Mono", "font-size": 12, "font-weight": 600, fill: COLORS.ink,
+  }, callout);
+  ctText.textContent = calloutText;
+}
+drawStaticEquilibrium(
+  document.getElementById("chart-eq-doughnut-ex"),
+  DOUGHNUT,
+  "Doughnut market equilibrium: D and S cross at $3 per doughnut and 50 doughnuts per week."
+);
+drawStaticEquilibrium(
+  document.getElementById("chart-eq-uber-ex"),
+  UBER,
+  "Uber rides market equilibrium: D and S cross at $20 per ride and 60 rides per hour."
+);
+
+/* ─────────────────────────────────────────────────────────────────────
+   §4 EQUILIBRIUM LAB (doughnut market, draggable price)
+   ──────────────────────────────────────────────────────────────────── */
+const Eq = (function () {
+  const cfg = DOUGHNUT;
+  const svg = makeSvg(document.getElementById("chart-eq"), {
+    label: "Doughnut market interactive lab. Drag the dashed horizontal price line up and down. Buyers' and sellers' quantities at that price update; the gap between them appears as a colored band.",
+  });
+  const ax = makeAxes(svg, cfg);
+  // gap bands first
+  const surplusBand = el("path", { class: "gap-band-surplus" }, svg);
+  const shortageBand = el("path", { class: "gap-band-shortage" }, svg);
+  drawCurveDemand(svg, cfg, ax, { demandQ: cfg.demandQ, label: "D" });
+  drawCurveSupply(svg, cfg, ax, { supplyQ: cfg.supplyQ, label: "S" });
+  // equilibrium reference dot (faint)
+  el("circle", { cx: ax.x_of(cfg.eqQ), cy: ax.y_of(cfg.eqP), r: 5, fill: COLORS.ink, opacity: 0.35 }, svg);
+  const eqLabel = el("text", { x: ax.x_of(cfg.eqQ) + 10, y: ax.y_of(cfg.eqP) + 18,
+    fill: COLORS.inkSoft, "font-family": "IBM Plex Mono", "font-size": 11, "letter-spacing": "0.04em" }, svg);
+  eqLabel.textContent = "equilibrium";
+
+  // Price line
+  const pLine = el("line", { x1: PX, x2: PX + PW, y1: ax.y_of(4.5), y2: ax.y_of(4.5), class: "price-line" }, svg);
+  // Grip on right
+  const grip = el("rect", { class: "price-grip", x: PX + PW + 2, y: ax.y_of(4.5) - 9, width: 22, height: 18, rx: 2 }, svg);
+  const gripT = el("text", { x: PX + PW + 13, y: ax.y_of(4.5) + 4, "text-anchor": "middle",
+    "font-family": "IBM Plex Mono", "font-size": 12, fill: COLORS.ink, "pointer-events": "none" }, svg);
+  gripT.textContent = "⇅";
+  // Large invisible hit area for dragging
+  const dragHit = el("rect", { x: PX, y: PY, width: PW + 30, height: PH, fill: "transparent", style: "cursor: ns-resize;" }, svg);
+
+  // Q markers
+  const qdDot = el("circle", { r: 5, fill: COLORS.demand, stroke: COLORS.paper, "stroke-width": 2 }, svg);
+  const qsDot = el("circle", { r: 5, fill: COLORS.supply, stroke: COLORS.paper, "stroke-width": 2 }, svg);
+
+  let price = 4.5;
+
+  function setBands(p) {
+    const qd = cfg.demandQ(p), qs = cfg.supplyQ(p);
+    const xD = ax.x_of(qd), xS = ax.x_of(qs);
+    const yE = ax.y_of(cfg.eqP);
+    const yP = ax.y_of(p);
+    if (p > cfg.eqP + 0.05) {
+      // surplus: wedge between equilibrium and current price; right of demand, left of supply
+      const path = `M ${ax.x_of(cfg.eqQ)} ${yE} L ${xD} ${yP} L ${xS} ${yP} Z`;
+      surplusBand.setAttribute("d", path);
+      shortageBand.setAttribute("d", "");
+    } else if (p < cfg.eqP - 0.05) {
+      const path = `M ${ax.x_of(cfg.eqQ)} ${yE} L ${xS} ${yP} L ${xD} ${yP} Z`;
+      shortageBand.setAttribute("d", path);
+      surplusBand.setAttribute("d", "");
+    } else {
+      surplusBand.setAttribute("d", "");
+      shortageBand.setAttribute("d", "");
+    }
+  }
+
+  function update(p) {
+    p = Math.max(0.1, Math.min(cfg.pMax - 0.1, p));
+    price = p;
+    const y = ax.y_of(p);
+    pLine.setAttribute("y1", y); pLine.setAttribute("y2", y);
+    grip.setAttribute("y", y - 9);
+    gripT.setAttribute("y", y + 4);
+    const qd = cfg.demandQ(p), qs = cfg.supplyQ(p);
+    qdDot.setAttribute("cx", ax.x_of(qd)); qdDot.setAttribute("cy", y);
+    qsDot.setAttribute("cx", ax.x_of(qs)); qsDot.setAttribute("cy", y);
+    setBands(p);
+
+    document.getElementById("eq-p").textContent = `$${p.toFixed(2).replace(/\.00$/, "").replace(/(\.\d)0$/, "$1")}`;
+    document.getElementById("eq-qd").textContent = qd.toFixed(0);
+    document.getElementById("eq-qs").textContent = qs.toFixed(0);
+
+    const cell = document.getElementById("eq-gap-cell");
+    const lbl = document.getElementById("eq-gap-label");
+    const val = document.getElementById("eq-gap");
+    cell.classList.remove("surplus", "shortage");
+    const gap = qs - qd;
+    if (Math.abs(gap) < 1) {
+      lbl.textContent = "Status";
+      val.textContent = "equilibrium";
+    } else if (gap > 0) {
+      cell.classList.add("surplus");
+      lbl.textContent = "Surplus";
+      val.textContent = "+" + gap.toFixed(0);
+    } else {
+      cell.classList.add("shortage");
+      lbl.textContent = "Shortage";
+      val.textContent = (-gap).toFixed(0);
+    }
+  }
+
+  let dragging = false;
+  function toY(e) {
+    const r = svg.getBoundingClientRect();
+    return ((e.clientY - r.top) * VB_H) / r.height;
+  }
+  function priceFromY(y) {
+    const clamped = Math.max(PY, Math.min(PY + PH, y));
+    return (PY + PH - clamped) / PH * cfg.pMax;
+  }
+  function onMove(e) { if (!dragging) return; update(priceFromY(toY(e))); e.preventDefault(); }
+  function startDrag(e) {
+    dragging = true;
+    svg.setPointerCapture(e.pointerId);
+    update(priceFromY(toY(e)));
+  }
+  function endDrag(e) {
+    dragging = false;
+    if (svg.hasPointerCapture(e.pointerId)) svg.releasePointerCapture(e.pointerId);
+  }
+  [grip, pLine, dragHit].forEach(node => node.addEventListener("pointerdown", startDrag));
+  svg.addEventListener("pointermove", onMove);
+  svg.addEventListener("pointerup", endDrag);
+  svg.addEventListener("pointercancel", endDrag);
+
+  svg.setAttribute("tabindex", "0");
+  svg.setAttribute("aria-label", "Doughnut market lab. Up and down arrow keys change price by $0.25.");
+  svg.addEventListener("keydown", e => {
+    if (e.key === "ArrowUp")   { update(price + 0.25); e.preventDefault(); }
+    if (e.key === "ArrowDown") { update(price - 0.25); e.preventDefault(); }
+    if (e.key === "Home")      { update(cfg.eqP); e.preventDefault(); }
+  });
+
+  document.getElementById("eq-snap").addEventListener("click", () => update(cfg.eqP));
+  document.getElementById("eq-high").addEventListener("click", () => update(5));
+  document.getElementById("eq-low").addEventListener("click",  () => update(1.5));
+
+  update(4.5);
+  return { update };
+})();
+
+/* ─────────────────────────────────────────────────────────────────────
+   §5 SIMULATOR with reasoning scaffold + worked example
+   ──────────────────────────────────────────────────────────────────── */
+const Sim = (function () {
+  const SCENARIOS = [
+    {
+      id: "heat",
+      title: "Heat wave hits in early summer",
+      market: "ice cream",
+      icon: "☼",
+      worked: true,           // FIRST scenario is the worked example
+      curve: "demand", direction: "right",
+      reasoning: {
+        q1: "Did the price of ice cream itself change?",
+        a1: "No. The heat wave changed the weather, not the price tag.",
+        q2: "So who's affected, and what's the direction?",
+        a2: "Buyers. At every price, people want more ice cream when it's hot.",
+        q3: "Which curve and which direction?",
+        a3: "Demand shifts right: more demanded at every price.",
+        q4: "What happens to the equilibrium?",
+        a4: "The equilibrium price rises and the equilibrium quantity rises. The market clears at a higher price and a larger amount.",
+      },
+      headline: "Demand for ice cream rises at every price.",
+      explain: "The heat wave is a change in conditions, not in the price of ice cream itself. At every price, buyers want more ice cream than before. The new equilibrium has both a higher price and a higher quantity.",
+    },
+    {
+      id: "solar",
+      title: "New tech halves the cost of producing solar panels",
+      market: "solar panels",
+      icon: "▲",
+      curve: "supply", direction: "right",
+      reasoning: {
+        q1: "Did the price of solar panels itself change?",
+        q2: "Who is affected, and how?",
+        q3: "Which curve moves, and in which direction?",
+        q4: "What happens to the equilibrium?",
+      },
+      headline: "Supply of solar panels rises at every price.",
+      explain: "The technology lowers the cost of producing at every price. Sellers can now profitably offer more solar panels at any price they used to charge. Supply rises at every price. The new equilibrium has a lower price and a higher quantity.",
+    },
+    {
+      id: "eggs",
+      title: "A new health study links daily egg consumption to lower heart-disease risk",
+      market: "eggs",
+      icon: "♥",
+      curve: "demand", direction: "right",
+      reasoning: {
+        q1: "Did the price of eggs itself change?",
+        q2: "Who is affected, and how?",
+        q3: "Which curve moves, and in which direction?",
+        q4: "What happens to the equilibrium?",
+      },
+      headline: "Demand for eggs rises at every price.",
+      explain: "The study changes buyers' preferences. At every price, more people now want eggs in their grocery cart. Demand rises at every price. The new equilibrium has both a higher price and a higher quantity.",
+    },
+    {
+      id: "chips",
+      title: "Global computer-chip shortage hits the auto industry",
+      market: "new cars",
+      icon: "◆",
+      curve: "supply", direction: "left",
+      reasoning: {
+        q1: "Did the price of cars itself change?",
+        q2: "Who is affected, and how?",
+        q3: "Which curve moves, and in which direction?",
+        q4: "What happens to the equilibrium?",
+      },
+      headline: "Supply of new cars falls at every price.",
+      explain: "An input (chips) became harder to get. Fewer cars can be produced at every price. The new equilibrium has a higher price and a lower quantity.",
+    },
+  ];
+
+  // Generic linear-ish "before" market for the chart panel; we just animate a shift.
+  // We use a normalized 0-100 market.
+  const SIM_CFG = {
+    pMax: 100, qMax: 100,
+    pUnit: "PRICE (relative)", qUnit: "QUANTITY (relative)",
+    pTicks: [], qTicks: [],
+    demandQ: p => Math.max(0, 100 - p),
+    supplyQ: p => Math.max(0, p),
+    eqP: 50, eqQ: 50,
+  };
+
+  const host = document.getElementById("sim-scenarios");
+  const playBtn = document.getElementById("sim-play");
+  const resetBtn = document.getElementById("sim-reset");
+  const predictBlock = document.getElementById("sim-predict");
+  const reasoningHost = document.getElementById("sim-reasoning");
+  let chosen = null, predictCurve = null, predictDir = null;
+  let played = new Set();
+
+  function renderScenarios() {
+    host.innerHTML = "";
+    SCENARIOS.forEach(s => {
+      const b = document.createElement("button");
+      b.className = "sim-scenario";
+      b.setAttribute("role", "radio");
+      b.setAttribute("aria-checked", "false");
+      b.setAttribute("aria-pressed", "false");
+      b.dataset.id = s.id;
+      const workedFlag = s.worked ? '<span class="sim-flag">worked example</span>' : '';
+      b.innerHTML = `<span class="sim-icon" aria-hidden="true">${s.icon}</span><span><strong>${s.title}.</strong> The market for ${s.market}.${workedFlag}</span>`;
+      b.addEventListener("click", () => pickScenario(s, b));
+      host.appendChild(b);
+    });
+  }
+
+  function pickScenario(s, btn) {
+    host.querySelectorAll(".sim-scenario").forEach(x => { x.setAttribute("aria-pressed", "false"); x.setAttribute("aria-checked", "false"); });
+    btn.setAttribute("aria-pressed", "true");
+    btn.setAttribute("aria-checked", "true");
+    chosen = s;
+    document.getElementById("sim-result").classList.remove("shown");
+    renderSimChart(s, 0);
+    renderReasoning(s);
+    if (s.worked) {
+      predictBlock.style.display = "none";
+    } else {
+      predictBlock.style.display = "grid";
+      predictCurve = null; predictDir = null;
+      document.querySelectorAll("#predict-which button, #predict-dir button").forEach(b => b.setAttribute("aria-pressed", "false"));
+      playBtn.disabled = true;
+    }
+  }
+
+  function renderReasoning(s) {
+    reasoningHost.innerHTML = "";
+    const box = document.createElement("div");
+    box.className = "reasoning";
+    if (s.worked) {
+      // Worked example: all four steps revealed
+      box.innerHTML = `
+        <h4>Worked example · the four-step move</h4>
+        <ol>
+          <li><strong>${s.reasoning.q1}</strong><span class="reveal">${s.reasoning.a1}</span></li>
+          <li><strong>${s.reasoning.q2}</strong><span class="reveal">${s.reasoning.a2}</span></li>
+          <li><strong>${s.reasoning.q3}</strong><span class="reveal">${s.reasoning.a3}</span></li>
+          <li><strong>${s.reasoning.q4}</strong><span class="reveal">${s.reasoning.a4}</span></li>
+        </ol>
+        <p style="margin-top: 14px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--ink-faint); text-transform: uppercase;">Press play to see the animation. Then try the other three on your own.</p>
+        <div style="margin-top: 10px;"><button class="btn primary" id="sim-play-worked">play the worked example</button></div>
+      `;
+      reasoningHost.appendChild(box);
+      document.getElementById("sim-play-worked").addEventListener("click", () => playWorked(s));
+    } else {
+      // Unguided: show the four questions as prompts (no answers)
+      box.innerHTML = `
+        <h4>Before you predict · work the four-step move</h4>
+        <ol>
+          <li><strong>${s.reasoning.q1}</strong></li>
+          <li><strong>${s.reasoning.q2}</strong></li>
+          <li><strong>${s.reasoning.q3}</strong></li>
+          <li><strong>${s.reasoning.q4}</strong></li>
+        </ol>
+      `;
+      reasoningHost.appendChild(box);
+    }
+  }
+
+  function renderSimPlaceholder() {
+    const host = document.getElementById("chart-sim");
+    host.innerHTML = "";
+    const svg = makeSvg(host, { label: "Pick a scenario above to see its market." });
+    const ax = makeAxes(svg, SIM_CFG);
+    drawCurveDemand(svg, SIM_CFG, ax, { demandQ: SIM_CFG.demandQ, opacity: 0.25, label: false });
+    drawCurveSupply(svg, SIM_CFG, ax, { supplyQ: SIM_CFG.supplyQ, opacity: 0.25, label: false });
+    const t1 = el("text", {
+      x: VB_W / 2, y: VB_H / 2 - 4,
+      "text-anchor": "middle",
+      "font-family": "Fraunces", "font-style": "italic",
+      "font-size": 22, fill: COLORS.inkFaint,
+    }, svg);
+    t1.textContent = "pick a scenario";
+    const t2 = el("text", {
+      x: VB_W / 2, y: VB_H / 2 + 22,
+      "text-anchor": "middle",
+      "font-family": "IBM Plex Mono", "font-size": 11, "letter-spacing": "0.10em",
+      fill: COLORS.inkFaint,
+    }, svg);
+    t2.textContent = "THEN PREDICT, THEN PLAY";
+  }
+  renderSimPlaceholder();
+
+  function renderSimChart(s, progress) {
+    const host = document.getElementById("chart-sim");
+    host.innerHTML = "";
+    const svg = makeSvg(host, { label: `Market for ${s.market}: before and after.` });
+    const ax = makeAxes(svg, SIM_CFG);
+    drawCurveDemand(svg, SIM_CFG, ax, {
+      demandQ: SIM_CFG.demandQ,
+      opacity: s.curve === "demand" ? 0.4 : 1,
+      label: s.curve === "demand" ? "D₁" : "D",
+    });
+    drawCurveSupply(svg, SIM_CFG, ax, {
+      supplyQ: SIM_CFG.supplyQ,
+      opacity: s.curve === "supply" ? 0.4 : 1,
+      label: s.curve === "supply" ? "S₁" : "S",
+    });
+    const off = (s.direction === "right" ? 1 : -1) * 25 * progress;
+    if (s.curve === "demand") {
+      const shifted = p => Math.max(0, SIM_CFG.demandQ(p) + off);
+      drawCurveDemand(svg, SIM_CFG, ax, { demandQ: shifted, label: progress > 0.1 ? "D₂" : "" });
+    } else {
+      const shifted = p => Math.max(0, SIM_CFG.supplyQ(p) + off);
+      drawCurveSupply(svg, SIM_CFG, ax, { supplyQ: shifted, label: progress > 0.1 ? "S₂" : "" });
+    }
+    el("circle", { cx: ax.x_of(50), cy: ax.y_of(50), r: 4, fill: COLORS.ink, opacity: 0.4 }, svg);
+    el("text", { x: ax.x_of(50) + 8, y: ax.y_of(50) + 16,
+      fill: COLORS.inkSoft, "font-family": "IBM Plex Mono", "font-size": 11 }, svg).textContent = "E₁";
+    if (progress > 0.95) {
+      let p2, q2;
+      if (s.curve === "demand") { p2 = (100 + off) / 2; q2 = p2; }
+      else { p2 = (100 + off) / 2; q2 = 100 - p2; }
+      p2 = Math.max(2, Math.min(98, p2));
+      q2 = Math.max(2, Math.min(98, q2));
+      el("circle", { cx: ax.x_of(q2), cy: ax.y_of(p2), r: 5, fill: COLORS.demand,
+        stroke: COLORS.paper, "stroke-width": 2 }, svg);
+      el("text", { x: ax.x_of(q2) + 10, y: ax.y_of(p2) - 6,
+        fill: COLORS.demand, "font-family": "IBM Plex Mono", "font-size": 11, "font-weight": 600 }, svg).textContent = "E₂";
+    }
+  }
+
+  function animatePlay(s, onComplete) {
+    const dur = 1000;
+    const start = performance.now();
+    function step(now) {
+      const t = Math.min(1, (now - start) / dur);
+      const e = 1 - Math.pow(1 - t, 3);
+      renderSimChart(s, e);
+      if (t < 1) requestAnimationFrame(step);
+      else onComplete();
+    }
+    requestAnimationFrame(step);
+  }
+
+  function playWorked(s) {
+    animatePlay(s, () => {
+      const resEl = document.getElementById("sim-result");
+      resEl.className = "sim-result shown right";
+      document.getElementById("sim-verdict").textContent = "Worked example complete.";
+      document.getElementById("sim-headline").textContent = s.headline;
+      document.getElementById("sim-explain").textContent = s.explain + "\n\nNow pick one of the other three scenarios and predict before you play.";
+      if (!played.has(s.id)) {
+        played.add(s.id);
+        Score.bump("sim", 1);
+      }
+    });
+  }
+
+  function checkReady() { playBtn.disabled = !(chosen && predictCurve && predictDir); }
+
+  document.querySelectorAll("#predict-which button").forEach(b => {
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#predict-which button").forEach(x => x.setAttribute("aria-pressed", "false"));
+      b.setAttribute("aria-pressed", "true");
+      predictCurve = b.dataset.predictCurve;
+      checkReady();
+    });
+  });
+  document.querySelectorAll("#predict-dir button").forEach(b => {
+    b.addEventListener("click", () => {
+      document.querySelectorAll("#predict-dir button").forEach(x => x.setAttribute("aria-pressed", "false"));
+      b.setAttribute("aria-pressed", "true");
+      predictDir = b.dataset.predictDir;
+      checkReady();
+    });
+  });
+
+  playBtn.addEventListener("click", () => {
+    if (!chosen) return;
+    if (played.has(chosen.id)) {
+      animatePlay(chosen, () => showResult(false));
+      return;
+    }
+    animatePlay(chosen, () => showResult(true));
+  });
+
+  function showResult(scoreThis) {
+    const resEl = document.getElementById("sim-result");
+    const correct = (predictCurve === chosen.curve) && (predictDir === chosen.direction);
+    resEl.className = "sim-result shown " + (correct ? "right" : "wrong");
+    document.getElementById("sim-verdict").textContent = correct ? "Correct prediction." : "Not quite.";
+    document.getElementById("sim-headline").textContent = chosen.headline;
+    let expl = chosen.explain;
+    if (!correct) {
+      expl += `\n\nYour prediction: ${predictCurve} shifts ${predictDir}.\nThe actual answer: ${chosen.curve} shifts ${chosen.direction}.`;
+    }
+    document.getElementById("sim-explain").textContent = expl;
+    if (scoreThis) {
+      played.add(chosen.id);
+      Score.bump("sim", correct ? 1 : 0);
+    }
+  }
+
+  resetBtn.addEventListener("click", () => {
+    chosen = null; predictCurve = null; predictDir = null;
+    played.clear();
+    document.getElementById("sim-result").classList.remove("shown");
+    renderSimPlaceholder();
+    reasoningHost.innerHTML = "";
+    predictBlock.style.display = "none";
+    host.querySelectorAll(".sim-scenario").forEach(x => { x.setAttribute("aria-pressed", "false"); x.setAttribute("aria-checked", "false"); });
+    document.querySelectorAll("#predict-which button, #predict-dir button").forEach(b => b.setAttribute("aria-pressed", "false"));
+    playBtn.disabled = true;
+    Score.reset("sim");
+  });
+
+  renderScenarios();
+})();
+
+/* ─────────────────────────────────────────────────────────────────────
+   COMPREHENSION QUESTIONS
+   ──────────────────────────────────────────────────────────────────── */
+(function bindCQ() {
+  document.querySelectorAll(".cq").forEach(cq => {
+    const key = cq.dataset.cq;
+    const optionButtons = cq.querySelectorAll(".cq-options button");
+    optionButtons.forEach(b => {
+      b.addEventListener("click", () => {
+        if ([...optionButtons].some(x => x.disabled)) return;
+        const correct = b.dataset.correct === "true";
+        optionButtons.forEach(o => {
+          o.disabled = true;
+          if (o.dataset.correct === "true") {
+            o.classList.add(o === b ? "chosen-correct" : "reveal-correct");
+          } else if (o === b) {
+            o.classList.add("chosen-wrong");
+          }
+        });
+        cq.querySelector(".cq-explanation").textContent = b.dataset.explain || "";
+        Score.set(key, correct ? 1 : 0);
+      });
+    });
+  });
+})();
+
+/* ─────────────────────────────────────────────────────────────────────
+   SCORE
+   ──────────────────────────────────────────────────────────────────── */
+const Score = (function () {
+  // Score keys: q1, q2, q3 (1 each) + sim (max 4). Total 7.
+  const state = {};
+  const TOTAL = { q1: 1, q2: 1, q3: 1, sim: 4 };
+  const totalMax = Object.values(TOTAL).reduce((a, b) => a + b, 0);
+  document.getElementById("score-total").textContent = totalMax;
+
+  function read() {
+    try { return JSON.parse(localStorage.getItem("u2lab-v2-score") || "{}"); } catch { return {}; }
+  }
+  function write() { localStorage.setItem("u2lab-v2-score", JSON.stringify(state)); }
+  function refresh() {
+    const total = Object.entries(state).reduce((a, [k, v]) => a + (typeof v === "number" ? v : 0), 0);
+    document.getElementById("score-num").textContent = total;
+    const pct = total / totalMax;
+    const deck = document.getElementById("score-deck");
+    const detail = document.getElementById("score-detail");
+    if (total === 0) {
+      deck.textContent = "work through the sections above to score";
+      detail.textContent = "Three comprehension questions and the four scenarios in the simulator each count for one point.";
+    } else if (pct === 1) {
+      deck.textContent = "you've got the four-step move down.";
+      detail.textContent = "Every interactive landed. The four-step reasoning is the spine of this whole course.";
+    } else if (pct >= 0.7) {
+      deck.textContent = "strong run.";
+      detail.textContent = "If anything still feels uncertain, the simulator is the highest-leverage section to revisit.";
+    } else if (pct >= 0.4) {
+      deck.textContent = "decent start.";
+      detail.textContent = "Working the four-step move on each simulator scenario is where most of the points are.";
+    } else {
+      deck.textContent = "early innings.";
+      detail.textContent = "The simulator's four-step reasoning template is the practice the unit was built around.";
+    }
+  }
+
+  function set(key, val) { state[key] = val; write(); refresh(); }
+  function bump(key, delta) {
+    state[key] = (state[key] || 0) + delta;
+    if (state[key] > TOTAL[key]) state[key] = TOTAL[key];
+    write(); refresh();
+  }
+  function reset(key) {
+    if (key) delete state[key];
+    else { for (const k in state) delete state[k]; }
+    write(); refresh();
+  }
+
+  Object.assign(state, read());
+  refresh();
+
+  document.getElementById("score-reset").addEventListener("click", () => {
+    reset();
+    document.querySelectorAll(".cq-options button").forEach(b => {
+      b.disabled = false;
+      b.classList.remove("chosen-correct", "chosen-wrong", "reveal-correct");
+    });
+    document.querySelectorAll(".cq-explanation").forEach(p => p.textContent = "");
+  });
+
+  return { set, bump, reset };
+})();
+</script>
+</body>
+</html>

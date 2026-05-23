@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The PPF Lab — ECONM-I Unit 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:#f4ead2; --paper-light:#fbf5e3; --paper-deep:#ead9af;
+  --ink:#1a120a; --ink-soft:#463a26; --ink-faint:#8a7654;
+  --rule:#c4a373; --rule-soft:#ddc99c;
+  --demand:#a83232; --supply:#3d5d2e; --gold:#c89933;
+  --display:"Fraunces","Iowan Old Style",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --gutter:28px; --radius:3px;
+  --motion-fast:180ms; --motion:320ms;
+  --ease:cubic-bezier(0.22,0.61,0.36,1);
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--display);font-variation-settings:"opsz" 14,"SOFT" 30;
+  font-size:18px;line-height:1.6;
+  background-image:radial-gradient(circle at 30% 20%,rgba(196,163,115,0.10),transparent 55%),radial-gradient(circle at 75% 80%,rgba(168,50,50,0.06),transparent 60%);
+}
+header.top{padding:60px var(--gutter) 30px;border-bottom:1px solid var(--rule);}
+.top-inner{max-width:1000px;margin:0 auto;}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 14px;display:flex;align-items:center;gap:14px;}
+.eyebrow::before{content:"";flex:0 0 32px;height:1px;background:var(--rule);}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--rule);}
+h1{font-family:var(--display);font-variation-settings:"opsz" 144,"SOFT" 0;font-weight:800;font-size:clamp(38px,6vw,68px);line-height:1;letter-spacing:-0.025em;margin:0 0 12px;}
+h1 em{font-style:italic;font-variation-settings:"opsz" 144,"SOFT" 100;color:var(--demand);}
+.top .deck{font-style:italic;font-size:20px;color:var(--ink-soft);max-width:36ch;margin:8px 0 0;font-variation-settings:"opsz" 36,"SOFT" 80;}
+
+.lab{max-width:1000px;margin:40px auto;padding:0 var(--gutter) 80px;display:grid;gap:40px;}
+.tool{background:var(--paper-light);border:1px solid var(--rule-soft);border-radius:var(--radius);padding:32px;}
+.tool .tool-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--demand);margin:0 0 8px;}
+.tool h2{font-family:var(--display);font-variation-settings:"opsz" 72,"SOFT" 20;font-weight:700;font-size:clamp(28px,4vw,40px);line-height:1.05;letter-spacing:-0.018em;margin:0 0 14px;}
+.tool h2 em{font-style:italic;font-variation-settings:"opsz" 72,"SOFT" 100;color:var(--demand);}
+.tool p{margin:0 0 12px;}
+.tool p.lede{font-size:18px;color:var(--ink-soft);margin-bottom:20px;}
+.tool strong{color:var(--ink);font-weight:600;}
+
+.ppf{display:grid;gap:24px;}
+@media(min-width:880px){.ppf{grid-template-columns:1.5fr 1fr;}}
+.ppf .chart-host svg{display:block;width:100%;height:auto;}
+.ppf .controls{display:flex;flex-direction:column;gap:20px;}
+.slider-block label{font-family:var(--mono);font-size:11px;letter-spacing:0.10em;text-transform:uppercase;color:var(--ink-faint);display:block;margin-bottom:8px;}
+.slider-block input[type=range]{width:100%;accent-color:var(--demand);}
+.slider-block .slider-help{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:0.04em;margin-top:6px;}
+.readout-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px;background:var(--paper);border:1px solid var(--rule-soft);border-radius:var(--radius);}
+.readout-cell{font-family:var(--mono);}
+.readout-cell .label{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-faint);display:block;margin-bottom:4px;}
+.readout-cell .value{font-family:var(--display);font-weight:700;font-size:32px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1;font-variation-settings:"opsz" 48,"SOFT" 0;}
+.readout-cell .value .small{font-size:14px;color:var(--ink-soft);font-weight:500;font-variation-settings:"opsz" 24,"SOFT" 60;}
+.opcost-cell{grid-column:1/-1;text-align:left;background:var(--demand);border-radius:var(--radius);padding:14px 18px;color:var(--paper);}
+.opcost-cell .label{color:rgba(255,255,255,0.7);}
+.opcost-cell .value{color:var(--paper);}
+.opcost-cell .value .small{color:rgba(255,255,255,0.7);}
+
+.btn{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.10em;text-transform:uppercase;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:var(--radius);padding:9px 14px;cursor:pointer;transition:background var(--motion-fast) var(--ease),border-color var(--motion-fast) var(--ease);}
+.btn:hover{background:#f0deb1;border-color:var(--gold);}
+.btn.primary{background:var(--demand);color:var(--paper);border-color:var(--demand);}
+.btn.primary:hover{background:#8a2828;border-color:#8a2828;}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;}
+.btn[aria-pressed="true"]{background:var(--demand);color:var(--paper);border-color:var(--demand);}
+
+.story{padding:18px;background:var(--paper);border:1px solid var(--rule-soft);border-radius:var(--radius);font-size:15.5px;line-height:1.55;}
+.story .story-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 6px;}
+.story p{margin:0 0 10px;}
+.story p:last-child{margin-bottom:0;}
+.story em{color:var(--demand);font-style:italic;}
+
+footer.colophon{padding:40px var(--gutter);border-top:1px solid var(--rule);font-family:var(--mono);font-size:11px;letter-spacing:0.06em;color:var(--ink-faint);text-align:center;background:var(--paper);}
+:focus-visible{outline:2px solid var(--demand);outline-offset:2px;}
+
+/* COMPREHENSION Q (matches U2 lab pattern) */
+.cq{margin-top:28px;background:var(--paper-light);border:1px solid var(--rule-soft);border-left:3px solid var(--demand);border-radius:var(--radius);padding:22px 24px 20px;}
+.cq .cq-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--demand);margin-bottom:8px;}
+.cq .cq-prompt{font-family:var(--display);font-weight:600;font-size:21px;line-height:1.35;margin:0 0 16px;}
+.cq .cq-options{list-style:none;padding:0;margin:0;display:grid;gap:8px;}
+.cq .cq-options li button{width:100%;text-align:left;font-family:var(--display);font-size:16px;color:var(--ink);background:var(--paper);border:1px solid var(--rule-soft);border-radius:var(--radius);padding:12px 14px;cursor:pointer;transition:border-color var(--motion-fast) var(--ease),background var(--motion-fast) var(--ease);}
+.cq .cq-options li button:hover{border-color:var(--gold);}
+.cq .cq-options li button.chosen-correct{background:#e6efd9;border-color:var(--supply);color:var(--supply);font-weight:600;}
+.cq .cq-options li button.chosen-wrong{background:#f3dada;border-color:var(--demand);color:var(--demand);}
+.cq .cq-options li button.reveal-correct{border-color:var(--supply);background:var(--paper-light);font-weight:600;}
+.cq .cq-options li button[disabled]{cursor:default;opacity:0.92;}
+.cq .cq-explanation{margin-top:14px;padding-top:14px;border-top:1px dashed var(--rule-soft);font-size:15px;line-height:1.5;color:var(--ink-soft);font-style:italic;}
+.cq .cq-explanation:empty{display:none;}
+.cq .cq-source{display:block;font-family:var(--mono);font-size:10px;letter-spacing:0.08em;color:var(--ink-faint);margin-top:12px;font-style:normal;text-transform:uppercase;}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <p class="eyebrow">ECONM-I · Unit 03 · The PPF lab</p>
+    <h1>The Production Possibilities <em>Frontier</em>.</h1>
+    <p class="deck">An economy that produces only bread and computers. Slide along the curve to see what one good costs in units of the other. Then watch growth move the whole frontier outward.</p>
+  </div>
+</header>
+
+<main class="lab">
+
+  <section class="tool" id="ppf">
+    <p class="tool-eyebrow">tool · the PPF lab</p>
+    <h2>Pick a production mix. <em>Watch the tradeoff.</em></h2>
+    <p class="lede">Bread on one axis, computers on the other. The curve shows the most this economy can produce of each, given its workers, machines, and electricity. Drag the slider to move the production point along the frontier. The Opportunity Cost readout tells you how many loaves of bread the next computer costs at that point.</p>
+
+    <div class="ppf">
+      <div class="chart-host" id="chart-ppf"></div>
+      <div class="controls">
+        <div class="slider-block">
+          <label for="ppf-slider">Production mix (computers ↔ bread)</label>
+          <input type="range" id="ppf-slider" min="0" max="100" value="50">
+          <p class="slider-help">drag, or use the buttons below.</p>
+          <div class="btn-row" style="margin-top:6px;">
+            <button class="btn" data-mix="10">all bread</button>
+            <button class="btn" data-mix="50">balanced</button>
+            <button class="btn" data-mix="90">all computers</button>
+          </div>
+        </div>
+
+        <div class="readout-grid">
+          <div class="readout-cell"><span class="label">Bread</span><span class="value"><span id="r-bread">600</span> <span class="small">loaves</span></span></div>
+          <div class="readout-cell"><span class="label">Computers</span><span class="value"><span id="r-comp">60</span></span></div>
+          <div class="readout-cell opcost-cell">
+            <span class="label">Opportunity cost of one more computer</span>
+            <span class="value"><span id="r-opcost">~10</span> <span class="small">loaves of bread</span></span>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn primary" id="grow-btn">grow the economy 10%</button>
+          <button class="btn" id="reset-btn">reset frontier</button>
+        </div>
+
+        <div class="story">
+          <p class="story-eyebrow">what just happened</p>
+          <p id="story-text">Currently producing 600 loaves and 60 computers. The slope of the frontier at this point is about <em>10 loaves of bread per computer</em>: if the economy redirected enough resources to make one more computer, it would lose roughly 10 loaves of bread doing so.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cq" data-cq="opcost">
+      <p class="cq-eyebrow">Quick check</p>
+      <p class="cq-prompt">Drag the slider all the way toward "all computers." Watch the Opportunity Cost readout (loaves of bread per computer). What happens to it?</p>
+      <ul class="cq-options">
+        <li><button data-correct="true" data-explain="Right. The frontier is bowed outward, so the slope gets steeper as you move toward all-computers. The resources getting redirected last (bakers, ovens) are bad at making computers; one more computer costs many loaves of bread.">It gets larger.</button></li>
+        <li><button data-correct="false" data-explain="No. A bowed-out PPF means opportunity cost rises as you specialize further. If the readout stayed the same, the frontier would be a straight line, which would mean all resources are equally good at both jobs.">It stays roughly the same.</button></li>
+        <li><button data-correct="false" data-explain="No. That would happen on a frontier that bowed inward (decreasing opportunity cost), which is not what real economies usually look like. Bowed-outward is the realistic case and it's what this curve shows.">It gets smaller.</button></li>
+      </ul>
+      <p class="cq-explanation"></p>
+      <span class="cq-source">Defined on: the chart and Opportunity Cost readout above.</span>
+    </div>
+  </section>
+
+  <section class="tool">
+    <p class="tool-eyebrow">how the lab teaches</p>
+    <h2>Three things the PPF makes <em>visible</em>.</h2>
+    <p class="lede">If the chart above seems abstract, three observations help. Each one is a move you will return to later in the course.</p>
+
+    <p><strong>1. Opportunity cost is the slope.</strong> The Opportunity Cost readout is the slope of the frontier at the production point. Move the slider toward "all computers" and watch the opportunity cost get larger. The last computers cost more bread to produce than the first ones did, because the resources being redirected are getting worse and worse at making computers.</p>
+
+    <p><strong>2. Growth is the curve moving outward.</strong> Click "grow the economy 10%." The whole frontier shifts. The economy can now produce more bread for the same amount of computers (or more computers for the same amount of bread, or some of both). This is what economic growth looks like in this diagram. Unit 9 takes up what makes the frontier move.</p>
+
+    <p><strong>3. Inside the curve is wasted potential.</strong> The chart doesn't let you move inside the frontier in this version of the lab; the production point sits on the curve. But it could. A recession is when an economy operates at a point inside its frontier: factories below capacity, workers unemployed, machines idle. Unit 11 takes that up.</p>
+
+    <div class="cq" data-cq="growth">
+      <p class="cq-eyebrow">Quick check</p>
+      <p class="cq-prompt">Click <strong>grow the economy 10%</strong>. The whole frontier moves outward (the original sits behind, dashed). In macroeconomic terms, what does that outward shift represent?</p>
+      <ul class="cq-options">
+        <li><button data-correct="true" data-explain="Right. Economic growth means the economy can now produce more of either good (or some of both) than it could before. The frontier expanding outward is the visual definition. Unit 9 takes up what makes the frontier move: more workers, more machines, better ideas, better institutions.">Economic growth: the economy can now produce more bread, more computers, or both.</button></li>
+        <li><button data-correct="false" data-explain="No. A recession is when the economy operates at a point inside its existing frontier (factories below capacity, workers idle). An outward shift is the opposite picture: the frontier itself moved.">A recession.</button></li>
+        <li><button data-correct="false" data-explain="No. Preferences would change which point on the frontier the economy chooses to produce at, not the position of the frontier itself.">A change in consumer preferences toward bread.</button></li>
+        <li><button data-correct="false" data-explain="No. The PPF is a real-resources diagram (workers, machines, electricity). The price level lives on a different picture you'll meet in unit 11.">A change in the price level.</button></li>
+      </ul>
+      <p class="cq-explanation"></p>
+      <span class="cq-source">Defined on: the second observation above and the grow-the-economy button.</span>
+    </div>
+  </section>
+
+</main>
+
+<footer class="colophon">
+  <p>ECONM-I · Unit 3 · The PPF lab · V1 draft 2026-05-19. Companion to the static U3 pages.</p>
+</footer>
+
+<script>
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs = {}, parent = null) {
+  const n = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v != null) n.setAttribute(k, String(v));
+  }
+  if (parent) parent.appendChild(n);
+  return n;
+}
+const COLORS = {
+  ink:"#1a120a", inkSoft:"#463a26", inkFaint:"#8a7654",
+  rule:"#c4a373", ruleSoft:"#ddc99c",
+  demand:"#a83232", supply:"#3d5d2e", gold:"#c89933", paper:"#fbf5e3",
+};
+
+const VB_W = 560, VB_H = 440;
+const PX = 70, PY = 30, PW = 440, PH = 340;
+
+let breadMax = 1000;   // max bread when all resources go to bread
+let compMax = 100;     // max computers when all go to computers
+const baseBreadMax = 1000, baseCompMax = 100;
+// Bowed-out frontier: x^2 / compMax^2 + y^2 / breadMax^2 = 1
+// (quarter ellipse). At a given fraction t along the curve (0 = pure bread, 1 = pure computers)
+// pick a point. We'll parameterize by angle theta from 0 (bread axis) to pi/2 (computer axis).
+function pointAt(t) {
+  // t in 0..1. Compute angle.
+  const theta = t * Math.PI / 2;
+  // x = compMax * sin(theta), y = breadMax * cos(theta)
+  return {
+    bread: breadMax * Math.cos(theta),
+    comp:  compMax  * Math.sin(theta),
+    theta,
+  };
+}
+// Slope dy/dx at a given t (loaves per computer at this point on the curve)
+function slopeAt(t) {
+  // dy/dx for ellipse: -breadMax^2 * x / (compMax^2 * y) -- negative slope, take absolute
+  const p = pointAt(t);
+  if (p.comp < 0.01) return 0;
+  if (p.bread < 0.01) return 999;
+  return (breadMax * breadMax * p.comp) / (compMax * compMax * p.bread);
+}
+
+function render(t) {
+  const host = document.getElementById("chart-ppf");
+  host.innerHTML = "";
+  const svg = el("svg", {
+    xmlns: NS,
+    viewBox: `0 0 ${VB_W} ${VB_H}`,
+    role: "img",
+    "aria-label": "Production Possibilities Frontier: bread on the vertical axis, computers on the horizontal axis. The curve bows outward.",
+  });
+  svg.style.maxWidth = "100%"; svg.style.height = "auto";
+  host.appendChild(svg);
+
+  const x_of = c => PX + (c / baseCompMax / 1.2) * PW;     // give some room past 100% baseline
+  const y_of = b => PY + PH - (b / baseBreadMax / 1.2) * PH;
+
+  // axes
+  el("line", { x1: PX, y1: PY - 6, x2: PX, y2: PY + PH + 2, stroke: COLORS.ink, "stroke-width": 1.4 }, svg);
+  el("line", { x1: PX - 2, y1: PY + PH, x2: PX + PW, y2: PY + PH, stroke: COLORS.ink, "stroke-width": 1.4 }, svg);
+  el("polygon", { points: `${PX},${PY - 12} ${PX - 4},${PY - 2} ${PX + 4},${PY - 2}`, fill: COLORS.ink }, svg);
+  el("polygon", { points: `${PX + PW},${PY + PH} ${PX + PW - 10},${PY + PH - 4} ${PX + PW - 10},${PY + PH + 4}`, fill: COLORS.ink }, svg);
+
+  // axis titles (outside plot)
+  el("text", {
+    x: PX - 50, y: PY + PH / 2, "text-anchor": "middle",
+    "font-family": "IBM Plex Mono", "font-size": 11, "letter-spacing": "0.14em", fill: COLORS.inkFaint,
+    transform: `rotate(-90 ${PX - 50} ${PY + PH / 2})`,
+  }, svg).textContent = "BREAD (loaves per day)";
+  el("text", {
+    x: PX + PW / 2, y: PY + PH + 38, "text-anchor": "middle",
+    "font-family": "IBM Plex Mono", "font-size": 11, "letter-spacing": "0.14em", fill: COLORS.inkFaint,
+  }, svg).textContent = "COMPUTERS (per day)";
+  el("text", { x: PX - 8, y: PY + PH + 14, "text-anchor": "end",
+    "font-family": "IBM Plex Mono", "font-size": 10, fill: COLORS.inkFaint }, svg).textContent = "0";
+
+  // axis ticks for current bread/comp max + baseline reference if grown
+  [200, 400, 600, 800, 1000, 1200].filter(v => v <= breadMax + 200).forEach(v => {
+    if (v > breadMax + 50) return;
+    const y = y_of(v);
+    el("line", { x1: PX - 4, y1: y, x2: PX, y2: y, stroke: COLORS.ink, "stroke-width": 1 }, svg);
+    el("text", { x: PX - 8, y: y + 4, "text-anchor": "end",
+      "font-family": "IBM Plex Mono", "font-size": 10, fill: COLORS.inkFaint }, svg).textContent = String(v);
+  });
+  [20, 40, 60, 80, 100, 120].filter(v => v <= compMax + 20).forEach(v => {
+    if (v > compMax + 10) return;
+    const x = x_of(v);
+    el("line", { x1: x, y1: PY + PH, x2: x, y2: PY + PH + 4, stroke: COLORS.ink, "stroke-width": 1 }, svg);
+    el("text", { x, y: PY + PH + 18, "text-anchor": "middle",
+      "font-family": "IBM Plex Mono", "font-size": 10, fill: COLORS.inkFaint }, svg).textContent = String(v);
+  });
+
+  // baseline (faint) frontier if economy has grown
+  if (breadMax > baseBreadMax) {
+    const baseSteps = 40;
+    let d = "";
+    for (let i = 0; i <= baseSteps; i++) {
+      const tt = i / baseSteps;
+      const theta = tt * Math.PI / 2;
+      const bx = baseCompMax * Math.sin(theta);
+      const by = baseBreadMax * Math.cos(theta);
+      d += (i === 0 ? "M " : "L ") + x_of(bx) + " " + y_of(by) + " ";
+    }
+    el("path", { d, fill: "none", stroke: COLORS.inkFaint, "stroke-width": 1.5, "stroke-dasharray": "4 4", opacity: 0.45 }, svg);
+    el("text", { x: x_of(baseCompMax * Math.sin(Math.PI/4)) - 8, y: y_of(baseBreadMax * Math.cos(Math.PI/4)) - 12,
+      "font-family": "IBM Plex Mono", "font-size": 10, "letter-spacing": "0.06em", fill: COLORS.inkFaint }, svg).textContent = "original";
+  }
+
+  // current frontier (the bow)
+  const steps = 50;
+  let d = "";
+  for (let i = 0; i <= steps; i++) {
+    const tt = i / steps;
+    const theta = tt * Math.PI / 2;
+    const bx = compMax * Math.sin(theta);
+    const by = breadMax * Math.cos(theta);
+    d += (i === 0 ? "M " : "L ") + x_of(bx) + " " + y_of(by) + " ";
+  }
+  el("path", { d, fill: "none", stroke: COLORS.demand, "stroke-width": 2.8, "stroke-linecap": "round" }, svg);
+
+  // Endpoint labels so students see what the curve hits when it goes "all bread" or "all computers."
+  // Top of bread axis: (0, breadMax). Right end of computer axis: (compMax, 0).
+  el("text", {
+    x: x_of(0) + 6, y: y_of(breadMax) + 4,
+    "font-family": "IBM Plex Mono", "font-size": 10, fill: COLORS.demand,
+  }, svg).textContent = `${Math.round(breadMax)} loaves`;
+  el("text", {
+    x: x_of(compMax), y: y_of(0) - 6, "text-anchor": "middle",
+    "font-family": "IBM Plex Mono", "font-size": 10, fill: COLORS.demand,
+  }, svg).textContent = `${Math.round(compMax)} computers`;
+
+  // production point
+  const p = pointAt(t);
+  const px = x_of(p.comp), py = y_of(p.bread);
+  // dashed projections to axes
+  el("line", { x1: px, y1: py, x2: px, y2: y_of(0), stroke: COLORS.ink, "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0.55 }, svg);
+  el("line", { x1: px, y1: py, x2: x_of(0), y2: py, stroke: COLORS.ink, "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0.55 }, svg);
+  // tangent line showing slope (short segment at the production point)
+  const slope = slopeAt(t);  // loaves per computer (positive number; treat as |dy/dx|)
+  const dx = 12, dy = slope; // scale: 1 computer in chart units... but scale visually
+  // For visualization: pick a small dx in screen pixels, compute dy in screen pixels using the chart-scale slope.
+  // Convert: dy_data = -slope * dx_data. In screen pixels:
+  // dx_data per pixel = baseCompMax * 1.2 / PW. dy_data per pixel = baseBreadMax * 1.2 / PH.
+  const dxData = (baseCompMax * 1.2 / PW) * 20;
+  const dyData = -slope * dxData;
+  const dxPx = (dxData / (baseCompMax * 1.2)) * PW;
+  const dyPx = -(dyData / (baseBreadMax * 1.2)) * PH;
+  el("line", {
+    x1: px - dxPx, y1: py - dyPx, x2: px + dxPx, y2: py + dyPx,
+    stroke: COLORS.gold, "stroke-width": 2, "stroke-linecap": "round",
+  }, svg);
+  // production dot
+  el("circle", { cx: px, cy: py, r: 7, fill: COLORS.ink, stroke: COLORS.paper, "stroke-width": 2 }, svg);
+  // production-point callout
+  const callout = el("g", {}, svg);
+  const calloutText = `${Math.round(p.bread)} loaves · ${Math.round(p.comp)} computers`;
+  const ctBg = el("rect", {
+    x: px + 12, y: py - 30,
+    width: calloutText.length * 6.5 + 14, height: 22,
+    rx: 3, ry: 3, fill: COLORS.paper, stroke: COLORS.ink, "stroke-width": 1,
+  }, callout);
+  el("text", {
+    x: px + 19, y: py - 15,
+    "font-family": "IBM Plex Mono", "font-size": 12, "font-weight": 600, fill: COLORS.ink,
+  }, callout).textContent = calloutText;
+
+  // readouts and story
+  document.getElementById("r-bread").textContent = Math.round(p.bread);
+  document.getElementById("r-comp").textContent = Math.round(p.comp);
+  document.getElementById("r-opcost").textContent = slope < 100 ? slope.toFixed(1) : "∞";
+
+  const grownText = breadMax > baseBreadMax ? ` The frontier has grown ${Math.round((breadMax/baseBreadMax - 1) * 100)}% beyond its original size.` : "";
+  document.getElementById("story-text").innerHTML =
+    `Currently producing <strong>${Math.round(p.bread)} loaves</strong> and <strong>${Math.round(p.comp)} computers</strong>. ` +
+    `The slope of the frontier at this point is about <em>${slope < 100 ? slope.toFixed(1) : "very steep"} loaves of bread per computer</em>: ` +
+    `if the economy redirected enough resources to make one more computer, it would lose roughly that many loaves of bread doing so.` +
+    grownText;
+}
+
+const slider = document.getElementById("ppf-slider");
+function update() { render(slider.value / 100); }
+slider.addEventListener("input", update);
+document.querySelectorAll("[data-mix]").forEach(b => {
+  b.addEventListener("click", () => { slider.value = b.dataset.mix; update(); });
+});
+document.getElementById("grow-btn").addEventListener("click", () => {
+  breadMax *= 1.10;
+  compMax *= 1.10;
+  update();
+});
+document.getElementById("reset-btn").addEventListener("click", () => {
+  breadMax = baseBreadMax;
+  compMax = baseCompMax;
+  slider.value = 50;
+  update();
+});
+update();
+
+/* Comprehension Q binding */
+document.querySelectorAll(".cq").forEach(cq => {
+  const optionButtons = cq.querySelectorAll(".cq-options button");
+  optionButtons.forEach(b => {
+    b.addEventListener("click", () => {
+      if ([...optionButtons].some(x => x.disabled)) return;
+      optionButtons.forEach(o => {
+        o.disabled = true;
+        if (o.dataset.correct === "true") {
+          o.classList.add(o === b ? "chosen-correct" : "reveal-correct");
+        } else if (o === b) {
+          o.classList.add("chosen-wrong");
+        }
+      });
+      cq.querySelector(".cq-explanation").textContent = b.dataset.explain || "";
+    });
+  });
+});
+</script>
+</body>
+</html>
