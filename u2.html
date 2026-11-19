@@ -14,7 +14,7 @@
   --paper-deep:   #ead9af;
   --ink:          #1a120a;
   --ink-soft:     #463a26;
-  --ink-faint:    #8a7654;
+  --ink-faint:    #776648;
   --rule:         #c4a373;
   --rule-soft:    #ddc99c;
   --demand:       #a83232;
@@ -23,7 +23,7 @@
   --supply:       #3d5d2e;
   --supply-soft:  #d8e0c5;
   --supply-tint:  rgba(61, 93, 46, 0.10);
-  --gold:         #c89933;
+  --gold:         #8b6a23;
   --gold-soft:    #f0deb1;
   --ok:           #4d7a3a;
   --bad:          #b04428;
@@ -258,8 +258,8 @@ button.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
   color: var(--gold); margin-left: 6px; padding: 2px 6px; border: 1px solid var(--gold); border-radius: 100px;
 }
 .sim-scenario:hover, .sim-scenario:focus-visible { border-color: var(--gold); outline: none; }
-.sim-scenario[aria-pressed="true"] { border-color: var(--demand); background: var(--demand-tint); }
-.sim-scenario[aria-pressed="true"] .sim-icon { background: var(--demand); color: var(--paper); border-color: var(--demand); }
+.sim-scenario[aria-checked="true"] { border-color: var(--demand); background: var(--demand-tint); }
+.sim-scenario[aria-checked="true"] .sim-icon { background: var(--demand); color: var(--paper); border-color: var(--demand); }
 
 .reasoning {
   margin: 18px 0; padding: 18px 20px; background: var(--paper-light); border: 1px solid var(--rule-soft);
@@ -647,11 +647,11 @@ const el = (tag, attrs = {}, parent = null) => {
   return node;
 };
 const COLORS = {
-  ink: "#1a120a", inkSoft: "#463a26", inkFaint: "#8a7654",
+  ink: "#1a120a", inkSoft: "#463a26", inkFaint: "#776648",
   rule: "#c4a373", ruleSoft: "#ddc99c",
   demand: "#a83232",
   supply: "#3d5d2e",
-  gold: "#c89933", paper: "#fbf5e3",
+  gold: "#8b6a23", paper: "#fbf5e3",
 };
 
 /* Chart geometry constants. viewBox is 600 x 380 with the plot region
@@ -1182,7 +1182,6 @@ const Sim = (function () {
       b.className = "sim-scenario";
       b.setAttribute("role", "radio");
       b.setAttribute("aria-checked", "false");
-      b.setAttribute("aria-pressed", "false");
       b.dataset.id = s.id;
       const workedFlag = s.worked ? '<span class="sim-flag">worked example</span>' : '';
       b.innerHTML = `<span class="sim-icon" aria-hidden="true">${s.icon}</span><span><strong>${s.title}.</strong> The market for ${s.market}.${workedFlag}</span>`;
@@ -1192,8 +1191,7 @@ const Sim = (function () {
   }
 
   function pickScenario(s, btn) {
-    host.querySelectorAll(".sim-scenario").forEach(x => { x.setAttribute("aria-pressed", "false"); x.setAttribute("aria-checked", "false"); });
-    btn.setAttribute("aria-pressed", "true");
+    host.querySelectorAll(".sim-scenario").forEach(x => { x.setAttribute("aria-checked", "false"); });
     btn.setAttribute("aria-checked", "true");
     chosen = s;
     document.getElementById("sim-result").classList.remove("shown");
@@ -1385,7 +1383,7 @@ const Sim = (function () {
     renderSimPlaceholder();
     reasoningHost.innerHTML = "";
     predictBlock.style.display = "none";
-    host.querySelectorAll(".sim-scenario").forEach(x => { x.setAttribute("aria-pressed", "false"); x.setAttribute("aria-checked", "false"); });
+    host.querySelectorAll(".sim-scenario").forEach(x => { x.setAttribute("aria-checked", "false"); });
     document.querySelectorAll("#predict-which button, #predict-dir button").forEach(b => b.setAttribute("aria-pressed", "false"));
     playBtn.disabled = true;
     Score.reset("sim");

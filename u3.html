@@ -10,9 +10,9 @@
 <style>
 :root {
   --paper:#f4ead2; --paper-light:#fbf5e3; --paper-deep:#ead9af;
-  --ink:#1a120a; --ink-soft:#463a26; --ink-faint:#8a7654;
+  --ink:#1a120a; --ink-soft:#463a26; --ink-faint:#776648;
   --rule:#c4a373; --rule-soft:#ddc99c;
-  --demand:#a83232; --supply:#3d5d2e; --gold:#c89933;
+  --demand:#a83232; --supply:#3d5d2e; --gold:#8b6a23;
   --display:"Fraunces","Iowan Old Style",Georgia,serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --gutter:28px; --radius:3px;
@@ -57,9 +57,9 @@ h1 em{font-style:italic;font-variation-settings:"opsz" 144,"SOFT" 100;color:var(
 .readout-cell .value{font-family:var(--display);font-weight:700;font-size:32px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1;font-variation-settings:"opsz" 48,"SOFT" 0;}
 .readout-cell .value .small{font-size:14px;color:var(--ink-soft);font-weight:500;font-variation-settings:"opsz" 24,"SOFT" 60;}
 .opcost-cell{grid-column:1/-1;text-align:left;background:var(--demand);border-radius:var(--radius);padding:14px 18px;color:var(--paper);}
-.opcost-cell .label{color:rgba(255,255,255,0.7);}
+.opcost-cell .label{color:rgba(255,255,255,0.85);}
 .opcost-cell .value{color:var(--paper);}
-.opcost-cell .value .small{color:rgba(255,255,255,0.7);}
+.opcost-cell .value .small{color:rgba(255,255,255,0.85);}
 
 .btn{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.10em;text-transform:uppercase;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:var(--radius);padding:9px 14px;cursor:pointer;transition:background var(--motion-fast) var(--ease),border-color var(--motion-fast) var(--ease);}
 .btn:hover{background:#f0deb1;border-color:var(--gold);}
@@ -202,9 +202,9 @@ function el(tag, attrs = {}, parent = null) {
   return n;
 }
 const COLORS = {
-  ink:"#1a120a", inkSoft:"#463a26", inkFaint:"#8a7654",
+  ink:"#1a120a", inkSoft:"#463a26", inkFaint:"#776648",
   rule:"#c4a373", ruleSoft:"#ddc99c",
-  demand:"#a83232", supply:"#3d5d2e", gold:"#c89933", paper:"#fbf5e3",
+  demand:"#a83232", supply:"#3d5d2e", gold:"#8b6a23", paper:"#fbf5e3",
 };
 
 const VB_W = 560, VB_H = 440;
